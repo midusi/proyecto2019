@@ -8225,6 +8225,13 @@ react-timer-mixin@^0.13.4:
   resolved "https://registry.yarnpkg.com/react-timer-mixin/-/react-timer-mixin-0.13.4.tgz#75a00c3c94c13abe29b43d63b4c65a88fc8264d3"
   integrity sha512-4+ow23tp/Tv7hBM5Az5/Be/eKKF7DIvJ09voz5LyHGQaqqz9WV8YMs31eFvcYQs7d451LSg7kDJV70XYN/Ug/Q==
 
+react-webcam@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-webcam/-/react-webcam-1.1.0.tgz#81214365da997717ebe7dac281e18ae8b50ee413"
+  integrity sha512-g5qFDkFs0FaplnrHC5du4xoXs5pEVHhTfRV0i3IuKh2EH1PZPE2chK+99p7h2LN/Sjd1YkQF5EfCTt+MFZtFQA==
+  dependencies:
+    prop-types "^15.5.8"
+
 react@^16.8.3:
   version "16.8.3"
   resolved "https://registry.yarnpkg.com/react/-/react-16.8.3.tgz#c6f988a2ce895375de216edcfaedd6b9a76451d9"
