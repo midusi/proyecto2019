@@ -15,8 +15,7 @@ en la terminal:
 $ git clone git@github.com:ulises-jeremias/proyecto-deep-learning-2019.git
 $ cd proyecto-deep-learning-2019
 $ yarn
-$ yarn build:dev
-$ yarn serve:dev
+$ yarn start
 ```
 
 o utilizando docker
