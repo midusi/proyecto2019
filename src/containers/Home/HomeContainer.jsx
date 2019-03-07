@@ -1,11 +1,27 @@
 import React from 'react'
+import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import Webcam from 'react-webcam'
-import { Container } from 'semantic-ui-react'
+import { Container, Divider, Button } from 'semantic-ui-react'
 
-const HomeContainer = () => (
-  <Container textAlign='center'>
-    <Webcam />
-  </Container>
-)
+const HomeContainer = props => {
+  const {
+    trans,
+  } = props
+
+  return (
+    <Container textAlign='center'>
+      <Webcam />
+      <Divider hidden />
+      <Button as={Link} to='/recognize'>
+        { trans('') }
+      </Button>
+    </Container>
+  )
+}
+
+HomeContainer.propTypes = {
+  trans: PropTypes.func.isRequired,
+}
 
 export default HomeContainer
