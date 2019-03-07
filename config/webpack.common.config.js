@@ -86,6 +86,13 @@ const config = {
         toType: 'dir'
       }
     ]),
+    new CopyWebpackPlugin([
+      {
+        from: commonPaths.models,
+        to: 'models',
+        toType: 'dir'
+      }
+    ]),
   ]
 }
 
