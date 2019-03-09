@@ -27,7 +27,7 @@ i18n
     fallbackLng: 'es',
 
     // have a common namespace used around the full app
-    ns: [ 'home' ],
+    ns: [ 'home', 'recognize' ],
     defaultNS: 'home',
 
     debug: process.env.NODE_ENV === 'development',
