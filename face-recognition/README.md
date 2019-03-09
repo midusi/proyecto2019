@@ -13,8 +13,10 @@ The following software is required to be installed on your system:
 
 Type the following commands in the terminal to verify your `node` and `yarn` versions:
 
+```bash
 $ node -v
 $ yarn -v
+```
 
 ### Install dependencies
 
