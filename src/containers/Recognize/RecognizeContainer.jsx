@@ -10,7 +10,7 @@ const MODEL_URL = '/models'
 const minConfidence = 0.6
 
 class RecognizeContainer extends Component {
-  constructor(props){
+  constructor(props) {
     super(props)
 
     this.fullFaceDescriptions = null
@@ -52,7 +52,7 @@ class RecognizeContainer extends Component {
     void this
 
     // await faceapi.loadModels(MODEL_URL)
-    
+
     await faceapi.loadFaceDetectionModel(MODEL_URL)
     await faceapi.loadFaceLandmarkModel(MODEL_URL)
     await faceapi.loadFaceRecognitionModel(MODEL_URL)

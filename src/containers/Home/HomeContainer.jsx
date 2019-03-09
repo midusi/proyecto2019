@@ -13,8 +13,8 @@ const HomeContainer = props => {
     <Container textAlign='center'>
       <Webcam />
       <Divider hidden />
-      <Button as={Link} to='/recognize'>
-        { trans('') }
+      <Button color='blue' as={Link} to='/recognize'>
+        { trans('home:option.recognize') }
       </Button>
     </Container>
   )
