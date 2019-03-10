@@ -15,12 +15,6 @@ import {
 
 class RecognizeContainer extends Component {
   static async loadModels () {
-    // FORMAT: await faceapi.loadModels(MODEL_URL)
-    
-    // await faceapi.loadFaceDetectionModel(MODEL_URL)
-    // await faceapi.loadFaceLandmarkModel(MODEL_URL)
-    // await faceapi.loadFaceRecognitionModel(MODEL_URL)
-    
     await faceapi.loadTinyFaceDetectorModel(MODEL_URL)
   }
 
@@ -47,8 +41,6 @@ class RecognizeContainer extends Component {
 
     this.fullFaceDescriptions = await faceapi.detectAllFaces(canvas, options)
     this.faceImages = await faceapi.extractFaces(canvas, this.fullFaceDescriptions)
-
-    console.log(this.fullFaceDescriptions)
   }
 
   drawDescription(canvas) {
@@ -69,6 +61,8 @@ class RecognizeContainer extends Component {
       await this.getFullFaceDescription(this.canvasPicWebCam.current)
       this.drawDescription(this.canvasPicWebCam.current)
       
+      /* clean the canvas to avoid overlapping faces */
+      ctxFace.clearRect(0, 0, this.canvasFace.current.width, this.canvasFace.current.height);
       ctxFace.drawImage(this.faceImages[0], 0, 0)
     }
     
