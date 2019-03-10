@@ -1,22 +1,39 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import Webcam from 'react-webcam'
-import { Container, Divider, Button } from 'semantic-ui-react'
+import { Button, Divider, Header } from 'semantic-ui-react'
+
+import homeBackground from 'src-static/images/home-background.jpg'
 
 const HomeContainer = props => {
   const {
     trans,
   } = props
 
+  void trans
+
   return (
-    <Container textAlign='center'>
-      <Webcam />
-      <Divider hidden />
-      <Button color='blue' as={Link} to='/recognize'>
-        { trans('home:option.recognize') }
-      </Button>
-    </Container>
+    <div id='home-container'>
+      <div className='bg-image' style={{ backgroundImage: `url(${homeBackground})` }} />
+      <div textAlign='center' className='bg-text'>
+        <Header as='h2' inverted>
+          { String(trans('home:title')).toUpperCase() }
+          <Header.Subheader inverted>
+            { trans('home:description') }
+          </Header.Subheader>
+        </Header>
+        <Divider hidden />
+        <Button
+          as={Link}
+          to='/recognize'
+          basic
+          inverted
+          color='blue'
+        >
+          { trans('home:option.recognize') }
+        </Button>
+      </div>
+    </div>
   )
 }
 
