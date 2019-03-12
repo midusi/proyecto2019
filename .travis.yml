@@ -13,6 +13,6 @@ deploy:
   provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
-  local_dir: .
+  keep-history: true
   on:
     branch: gh-pages
