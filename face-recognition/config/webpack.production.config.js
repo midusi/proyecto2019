@@ -27,7 +27,7 @@ const config = {
         to: commonPaths.templatesOutputServerPath,
         transform: content => {
           return Buffer.from(
-            content.toString().replace(new RegExp('{{base}}', 'g'), '/'),
+            content.toString().replace(new RegExp('{{base}}', 'g'), 'https://midusi.github.io/proyecto2019/'),
             'utf8'
           )
         }
