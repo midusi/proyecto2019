@@ -15,4 +15,4 @@ deploy:
   github_token: $GITHUB_TOKEN
   keep-history: true
   on:
-    branch: gh-pages
+    branch: master
