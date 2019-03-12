@@ -9,6 +9,7 @@ class WebCamPicure extends Component {
     this.webcam = React.createRef()
 
     this.capture = this.capture.bind(this)
+    this.interval = null
   }
 
   componentDidMount() {
@@ -16,7 +17,11 @@ class WebCamPicure extends Component {
       refreshTime,
     } = this.props
 
-    setInterval(this.capture, refreshTime)
+    this.interval = setInterval(this.capture, refreshTime)
+  }
+  
+  componentWillUnmount() {
+    clearInterval(this.interval)
   }
 
   capture() {
