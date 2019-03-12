@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+  - "10.7"
+cache:
+  directories:
+  - face-recognition/node_modules
+script:
+  - cd face-recognition
+  - yarn
+  - yarn build:prod
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: .
+  on:
+    branch: gh-pages
