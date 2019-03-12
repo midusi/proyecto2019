@@ -4,7 +4,7 @@ const TerserWebpackPlugin = require('terser-webpack-plugin')
 
 const commonPaths = require('./common-paths')
 
-const URL_BASE = 'https://midusi.github.io/proyecto2019/'
+const URL_BASE = 'https://midusi.github.io/proyecto2019'
 
 const config = {
   output: {
