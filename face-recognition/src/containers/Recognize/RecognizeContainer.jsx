@@ -77,7 +77,7 @@ class RecognizeContainer extends Component {
     return (
       <Container>
         <Segment>
-          <Grid columns={3}>
+          <Grid columns={3} stackable>
             <Grid.Row>
               <Grid.Column>
                 { trans('recognize:webcam') }
