@@ -4,13 +4,13 @@ const TerserWebpackPlugin = require('terser-webpack-plugin')
 
 const commonPaths = require('./common-paths')
 
-const URL_BASE = 'https://midusi.github.io/proyecto2019'
+const URL_BASE = 'https://midusi.github.io'
 
 const config = {
   output: {
     filename: 'bundle.js',
     path: commonPaths.outputServerPath,
-    publicPath: '/'
+    publicPath: '/proyecto2019/'
   },
   devtool: 'source-map',
   mode: 'production',
@@ -31,7 +31,7 @@ const config = {
           return Buffer.from(
             content.toString()
               .replace('<!-- base -->', `<base href="${URL_BASE}/">`)
-              .replace(new RegExp('{{base}}', 'g'), '/'),
+              .replace(new RegExp('{{base}}', 'g'), `${URL_BASE}/proyecto2019/`),
             'utf8'
           )
         }
