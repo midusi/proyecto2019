@@ -16,13 +16,16 @@ import {
 class RecognizeContainer extends Component {
   static async loadModels () {
     await faceapi.loadTinyFaceDetectorModel(MODEL_URL)
+    await faceapi.loadFaceExpressionModel(MODEL_URL)
   }
 
   constructor(props) {
     super(props)
 
     this.fullFaceDescriptions = null
+    this.faces = null
     this.faceImages = null
+
     this.canvasPicWebCam = React.createRef()
     this.canvasFace = React.createRef()
 
@@ -39,12 +42,16 @@ class RecognizeContainer extends Component {
       scoreThreshold: MIN_CONFIDENCE
     })
 
-    this.fullFaceDescriptions = await faceapi.detectAllFaces(canvas, options)
-    this.faceImages = await faceapi.extractFaces(canvas, this.fullFaceDescriptions)
+    this.fullFaceDescriptions = await faceapi
+      .detectAllFaces(canvas, options)
+      .withFaceExpressions()
+    
+    this.faces = this.fullFaceDescriptions.map(({ detection }) => detection)
+    this.faceImages = await faceapi.extractFaces(canvas, this.faces)
   }
 
   drawDescription(canvas) {
-    this.fullFaceDescriptions.forEach(fd => {
+    Array.from(this.faces || []).forEach(fd => {
       faceapi.drawDetection(canvas, fd.box)
     })
   }
@@ -62,8 +69,8 @@ class RecognizeContainer extends Component {
       this.drawDescription(this.canvasPicWebCam.current)
       
       /* clean the canvas to avoid overlapping faces */
-      ctxFace.clearRect(0, 0, this.canvasFace.current.width, this.canvasFace.current.height);
-      ctxFace.drawImage(this.faceImages[0], 0, 0)
+      ctxFace.clearRect(0, 0, this.canvasFace.current.width, this.canvasFace.current.height)
+      this.faceImages[0] && ctxFace.drawImage(this.faceImages[0], 0, 0)
     }
     
     image.src = picture
@@ -77,7 +84,7 @@ class RecognizeContainer extends Component {
     return (
       <Container>
         <Segment>
-          <Grid columns={3} stackable>
+          <Grid columns={3} doubling centered>
             <Grid.Row>
               <Grid.Column>
                 { trans('recognize:webcam') }
