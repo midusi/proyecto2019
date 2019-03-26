@@ -23,11 +23,10 @@ class RecognizeContainer extends Component {
     super(props)
 
     this.fullFaceDescriptions = null
-    this.faces = null
     this.faceImages = null
 
     this.canvasPicWebCam = React.createRef()
-    this.canvasFace = React.createRef()
+    // this.canvasFace = React.createRef()
 
     this.landmarkWebCamPicture = this.landmarkWebCamPicture.bind(this)
   }
@@ -46,19 +45,17 @@ class RecognizeContainer extends Component {
       .detectAllFaces(canvas, options)
       .withFaceExpressions()
     
-    this.faces = this.fullFaceDescriptions.map(({ detection }) => detection)
-    this.faceImages = await faceapi.extractFaces(canvas, this.faces)
+    this.faceImages = await faceapi.extractFaces(canvas, this.fullFaceDescriptions.map(({ detection }) => detection))
   }
 
   drawDescription(canvas) {
-    Array.from(this.faces || []).forEach(fd => {
-      faceapi.drawDetection(canvas, fd.box)
-    })
+    faceapi.drawDetection(canvas, this.fullFaceDescriptions.map(({ detection }) => detection).map(fd => fd.box))
+    faceapi.drawFaceExpressions(canvas, this.fullFaceDescriptions.map(({ detection, expressions }) => ({ position: detection.box, expressions })))
   }
 
   landmarkWebCamPicture(picture) {
     const ctx = this.canvasPicWebCam.current.getContext('2d')
-    const ctxFace = this.canvasFace.current.getContext('2d')
+    // const ctxFace = this.canvasFace.current.getContext('2d')
     
     var image = new Image()
     
@@ -69,8 +66,8 @@ class RecognizeContainer extends Component {
       this.drawDescription(this.canvasPicWebCam.current)
       
       /* clean the canvas to avoid overlapping faces */
-      ctxFace.clearRect(0, 0, this.canvasFace.current.width, this.canvasFace.current.height)
-      this.faceImages[0] && ctxFace.drawImage(this.faceImages[0], 0, 0)
+      // ctxFace.clearRect(0, 0, this.canvasFace.current.width, this.canvasFace.current.height)
+      // this.faceImages[0] && ctxFace.drawImage(this.faceImages[0], 0, 0)
     }
     
     image.src = picture
@@ -84,7 +81,7 @@ class RecognizeContainer extends Component {
     return (
       <Container>
         <Segment>
-          <Grid columns={3} doubling centered>
+          <Grid columns={2} doubling centered>
             <Grid.Row>
               <Grid.Column>
                 { trans('recognize:webcam') }
@@ -92,9 +89,9 @@ class RecognizeContainer extends Component {
               <Grid.Column>
                 { trans('recognize:capturedImages') }
               </Grid.Column>
-              <Grid.Column>
+              {/*<Grid.Column>
                 { trans('recognize:capturedFace') }
-              </Grid.Column>
+              </Grid.Column>*/}
             </Grid.Row>
             <Grid.Row>
               <Grid.Column>
@@ -112,9 +109,9 @@ class RecognizeContainer extends Component {
               <Grid.Column>
                 <canvas ref={this.canvasPicWebCam} width={350} height={350} />
               </Grid.Column>
-              <Grid.Column>
+              {/*<Grid.Column>
                 <canvas ref={this.canvasFace} width={350} height={350} />
-              </Grid.Column>
+              </Grid.Column>*/}
             </Grid.Row>
           </Grid>
         </Segment>
