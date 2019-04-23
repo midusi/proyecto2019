@@ -15,7 +15,7 @@ import {
   INPUT_SIZE,
 } from 'src/config/recognition'
 
-import { centroid, slope, detectionCoordinates, rotate } from './mathHelper'
+import { centroid, slope, detectionCoordinates, distance, generateBoxWithXCentroid } from './mathHelper'
 
 class RecognizeContainer extends Component {
   static async loadModels() {
@@ -61,7 +61,9 @@ class RecognizeContainer extends Component {
       .withFaceLandmarks()
     
     if (this.fullFaceDescriptions[0]){
-      this.faceAngle = Math.atan(slope(centroid(this.fullFaceDescriptions[0].landmarks.getLeftEye()),centroid(this.fullFaceDescriptions[0].landmarks.getRightEye())))
+      this.rightEyeCentroid = centroid(this.fullFaceDescriptions[0].landmarks.getRightEye())
+      this.leftEyeCentroid = centroid(this.fullFaceDescriptions[0].landmarks.getLeftEye())
+      this.faceAngle = Math.atan(slope(this.leftEyeCentroid,this.rightEyeCentroid))
       this.setState(() => (
         {faceExpresions: this.fullFaceDescriptions[0].expressions.map(
           (expression) => {return [expression.expression, expression.probability]}
@@ -71,60 +73,43 @@ class RecognizeContainer extends Component {
   }
 
   extractFaces(img){
-    var points = detectionCoordinates(this.fullFaceDescriptions[0].detection.box)
-    var width=this.fullFaceDescriptions[0].detection.box.width
-    var height=this.fullFaceDescriptions[0].detection.box.height
-    var xc = points[0].x + width/2
-    var yc = points[0].y + height/2
-    for(i=0;i<points.length;i++){
-      p = points[i]
-      points[i] = rotate(xc, yc, p.x, p.y, -this.faceAngle)
-    }
-    // calculate the size of the user's clipping area
-    var minX=10000;
-    var minY=10000;
-    var maxX=-10000;
-    var maxY=-10000;
-    var i, p
-    for(i=0;i<points.length;i++){
-      p=points[i];
-      if(p.x<minX){minX=p.x;}
-      if(p.y<minY){minY=p.y;}
-      if(p.x>maxX){maxX=p.x;}
-      if(p.y>maxY){maxY=p.y;}
-    }
-    width=maxX-minX;
-    height=maxY-minY;
+    var desiredFaceWidth = 256
+    var desiredFaceHeight = desiredFaceWidth
 
-    // clip the image into the user's clipping area
+    var desiredLeftEye = {x: 0.35, y: 0.2}
+    var desiredRightEyeX = 1.0 - desiredLeftEye.x
+    // calculate scale to desired width
+    var dist = distance(this.rightEyeCentroid, this.leftEyeCentroid)
+    var desiredDist = (desiredRightEyeX - desiredLeftEye.x)
+    desiredDist *= desiredFaceWidth
+    var scale = desiredDist / dist
+
+    // generate the box
+    var eyesCentroid = centroid([this.leftEyeCentroid, this.rightEyeCentroid])
+    points = generateBoxWithXCentroid(eyesCentroid, desiredFaceWidth, desiredFaceHeight, desiredLeftEye)
+
     var offscreen = new OffscreenCanvas(this.canvasPicWebCam.current.width, this.canvasPicWebCam.current.height);
     var ctx = offscreen.getContext('2d')
     ctx.save();
     ctx.clearRect(0,0,this.canvasPicWebCam.current.width, this.canvasPicWebCam.current.height);
-    ctx.beginPath();
-    ctx.moveTo(points[0].x,points[0].y);
-    for(i=1;i<points.length;i++){
-      p=points[i];
-      ctx.lineTo(points[i].x,points[i].y);
-    }
-    ctx.closePath();
-    ctx.clip();
+    ctx.translate(eyesCentroid.x, eyesCentroid.y)
+    ctx.rotate(-this.faceAngle)
+    ctx.translate(-eyesCentroid.x, -eyesCentroid.y)
+    ctx.translate(eyesCentroid.x, eyesCentroid.y)
+    ctx.scale(scale,scale)
+    ctx.translate(-eyesCentroid.x, -eyesCentroid.y)
     ctx.drawImage(img,0,0);
     ctx.restore();
 
     // resize the new canvas to the size of the clipping area
     const ctxFace = this.canvasFace.current.getContext('2d')
     ctxFace.clearRect(0, 0, this.canvasFace.current.width, this.canvasFace.current.height)
-    this.canvasFace.current.width=width;
-    this.canvasFace.current.height=height;
+    this.canvasFace.current.width=desiredFaceWidth;
+    this.canvasFace.current.height=desiredFaceHeight;
 
     // draw the clipped image from the main canvas to the new canvas
-    ctxFace.save()
-    ctxFace.translate(width/2, height/2); //let's translate
-    ctxFace.rotate(-this.faceAngle)
-    ctxFace.translate(-(width/2), -(height/2)); //let's translate
-    ctxFace.drawImage(offscreen.transferToImageBitmap(), minX,minY,width,height, 0,0,width,height);
-    ctxFace.restore()
+    ctxFace.drawImage(offscreen.transferToImageBitmap(), points[0].x, points[0].y, desiredFaceWidth, desiredFaceHeight, 
+      0,0,desiredFaceWidth,desiredFaceHeight);
   }
 
   drawDescription(canvas) {

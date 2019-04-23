@@ -27,3 +27,16 @@ export const rotate = (cx, cy, x, y, angle) => {
     ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
   return {x: nx, y: ny};
 }
+
+export const distance = (p1, p2) => {
+  return Math.hypot(p2.x-p1.x, p2.y-p1.y)
+}
+
+export const generateBoxWithXCentroid = (eyesCentroid, width, height, desiredLeftEye) => {
+  return [
+    {x: eyesCentroid.x-width/2, y: eyesCentroid.y-height*desiredLeftEye.y},
+    {x: eyesCentroid.x+width/2, y: eyesCentroid.y-height*desiredLeftEye.y},
+    {x: eyesCentroid.x+width/2, y: eyesCentroid.y+height*(1-desiredLeftEye.y)},
+    {x: eyesCentroid.x-width/2, y: eyesCentroid.y+height*(1-desiredLeftEye.y)},
+  ]
+}
