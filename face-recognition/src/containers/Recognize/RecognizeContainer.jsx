@@ -15,7 +15,7 @@ import {
   INPUT_SIZE,
 } from 'src/config/recognition'
 
-import { centroid, slope, detectionCoordinates, distance, generateBoxWithXCentroid } from './mathHelper'
+import { centroid, slope, distance, generateBoxWithXCentroid } from './mathHelper'
 
 class RecognizeContainer extends Component {
   static async loadModels() {
@@ -86,7 +86,7 @@ class RecognizeContainer extends Component {
 
     // generate the box
     var eyesCentroid = centroid([this.leftEyeCentroid, this.rightEyeCentroid])
-    points = generateBoxWithXCentroid(eyesCentroid, desiredFaceWidth, desiredFaceHeight, desiredLeftEye)
+    var points = generateBoxWithXCentroid(eyesCentroid, desiredFaceWidth, desiredFaceHeight, desiredLeftEye)
 
     var offscreen = new OffscreenCanvas(this.canvasPicWebCam.current.width, this.canvasPicWebCam.current.height);
     var ctx = offscreen.getContext('2d')
