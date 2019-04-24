@@ -12,18 +12,6 @@ class WebCamPicure extends Component {
     this.interval = null
   }
 
-  componentDidMount() {
-    const {
-      refreshTime,
-    } = this.props
-
-    this.interval = setInterval(this.capture, refreshTime)
-  }
-  
-  componentWillUnmount() {
-    clearInterval(this.interval)
-  }
-
   capture() {
     const {
       landmarkPicture,
