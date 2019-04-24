@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import { Container, Segment, Grid } from 'semantic-ui-react'
+import { Container, Segment, Grid, Button } from 'semantic-ui-react'
 
 import * as faceapi from 'face-api.js'
 
@@ -10,11 +10,10 @@ import {
   MODEL_URL,
   MIN_CONFIDENCE,
   INPUT_SIZE,
-  REFRESH_TIME,
 } from 'src/config/recognition'
 
 class RecognizeContainer extends Component {
-  static async loadModels () {
+  static async loadModels() {
     await faceapi.loadTinyFaceDetectorModel(MODEL_URL)
     await faceapi.loadFaceExpressionModel(MODEL_URL)
   }
@@ -22,13 +21,20 @@ class RecognizeContainer extends Component {
   constructor(props) {
     super(props)
 
+    this.state = {
+      recognize: false,
+    }
+
     this.fullFaceDescriptions = null
     this.faceImages = null
 
+    this.webCamPicture = React.createRef()
     this.canvasPicWebCam = React.createRef()
     // this.canvasFace = React.createRef()
 
     this.landmarkWebCamPicture = this.landmarkWebCamPicture.bind(this)
+    this.runRecognition = this.runRecognition.bind(this)
+    this.resetRecognition = this.resetRecognition.bind(this)
   }
 
   async componentDidMount() {
@@ -45,12 +51,23 @@ class RecognizeContainer extends Component {
       .detectAllFaces(canvas, options)
       .withFaceExpressions()
     
-    this.faceImages = await faceapi.extractFaces(canvas, this.fullFaceDescriptions.map(({ detection }) => detection))
+    this.faceImages = await faceapi
+      .extractFaces(canvas, this.fullFaceDescriptions.map(({ detection }) => detection))
   }
 
   drawDescription(canvas) {
-    faceapi.drawDetection(canvas, this.fullFaceDescriptions.map(({ detection }) => detection).map(fd => fd.box))
-    faceapi.drawFaceExpressions(canvas, this.fullFaceDescriptions.map(({ detection, expressions }) => ({ position: detection.box, expressions })))
+    const drawableDetections = this.fullFaceDescriptions
+      .map(({ detection }) => detection)
+      .map(fd => fd.box)
+
+    const drawableExpressions = this.fullFaceDescriptions
+      .map(({ detection, expressions }) => ({
+        position: detection.box,
+        expressions,
+      }))
+
+    faceapi.drawDetection(canvas, drawableDetections)
+    faceapi.drawFaceExpressions(canvas, drawableExpressions)
   }
 
   landmarkWebCamPicture(picture) {
@@ -73,46 +90,68 @@ class RecognizeContainer extends Component {
     image.src = picture
   }
 
+  runRecognition() {
+    this.setState(() => ({
+      recognize: true,
+    }))
+
+    this.webCamPicture.current.capture()
+  }
+
+  resetRecognition() {
+    this.setState(() => ({
+      recognize: false,
+    }))
+
+    this.fullFaceDescriptions = null
+    this.faceImages = null
+  }
+
   render() {
+    const {
+      recognize,
+    } = this.state
+
     const {
       trans,
     } = this.props
 
+    void trans
+
     return (
-      <Container>
-        <Segment>
-          <Grid columns={2} doubling centered>
-            <Grid.Row>
-              <Grid.Column>
-                { trans('recognize:webcam') }
-              </Grid.Column>
-              <Grid.Column>
-                { trans('recognize:capturedImages') }
-              </Grid.Column>
-              {/*<Grid.Column>
-                { trans('recognize:capturedFace') }
-              </Grid.Column>*/}
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column>
+      <Container text>
+        <Segment placeholder>
+          <Grid columns={2}>
+            <Grid.Column>
+              <canvas
+                ref={this.canvasPicWebCam}
+                width={350}
+                height={350}
+                style={{ display: recognize ? undefined : 'none' }}
+              />
+
+              { recognize ? null : (
                 <WebCamPicture
+                  ref={this.webCamPicture}
                   landmarkPicture={this.landmarkWebCamPicture}
-                  refreshTime={REFRESH_TIME}
                   videoConstraints={{
                     width: 350,
                     height: 350,
                     facingMode: 'user',
                   }}
                 />
-
-              </Grid.Column>
-              <Grid.Column>
-                <canvas ref={this.canvasPicWebCam} width={350} height={350} />
-              </Grid.Column>
-              {/*<Grid.Column>
-                <canvas ref={this.canvasFace} width={350} height={350} />
-              </Grid.Column>*/}
-            </Grid.Row>
+              )}
+            </Grid.Column>
+            <Grid.Column verticalAlign='middle'>
+              <Button 
+                circular
+                icon='camera'
+                color='red'
+                basic
+                size='huge'
+                onClick={recognize ? this.resetRecognition : this.runRecognition}
+              />
+            </Grid.Column>
           </Grid>
         </Segment>
       </Container>
