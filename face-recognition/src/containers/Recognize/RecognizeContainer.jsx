@@ -94,8 +94,6 @@ class RecognizeContainer extends Component {
     ctx.clearRect(0,0,this.canvasPicWebCam.current.width, this.canvasPicWebCam.current.height);
     ctx.translate(eyesCentroid.x, eyesCentroid.y)
     ctx.rotate(-this.faceAngle)
-    ctx.translate(-eyesCentroid.x, -eyesCentroid.y)
-    ctx.translate(eyesCentroid.x, eyesCentroid.y)
     ctx.scale(scale,scale)
     ctx.translate(-eyesCentroid.x, -eyesCentroid.y)
     ctx.drawImage(img,0,0);
