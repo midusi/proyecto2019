@@ -10,6 +10,7 @@ import {
   MODEL_URL,
   MIN_CONFIDENCE,
   INPUT_SIZE,
+  MIN_PROBABILITY,
 } from 'src/config/recognition'
 
 class RecognizeContainer extends Component {
@@ -67,7 +68,7 @@ class RecognizeContainer extends Component {
       }))
 
     faceapi.draw.drawDetections(canvas, drawableDetections)
-    faceapi.draw.drawFaceExpressions(canvas, drawableExpressions)
+    faceapi.draw.drawFaceExpressions(canvas, drawableExpressions, MIN_PROBABILITY)
   }
 
   landmarkWebCamPicture(picture) {
