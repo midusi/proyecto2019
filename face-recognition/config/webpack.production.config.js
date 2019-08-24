@@ -12,7 +12,6 @@ const config = {
     path: commonPaths.outputServerPath,
     publicPath: '/proyecto2019/'
   },
-  devtool: 'source-map',
   mode: 'production',
   plugins: [
     new TerserWebpackPlugin({
