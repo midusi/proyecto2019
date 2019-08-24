@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 if (module.hot) {
   module.hot.accept('./routes/app', () => {
-    render(AppRoutes)
+    render(AppRoutes).catch()
 
-    render(require('src/routes/app'))
+    render(require('src/routes/app')).catch()
   })
 }
