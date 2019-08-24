@@ -19,7 +19,8 @@ const config = {
     }),
     new CleanWebpackPlugin({
       verbose: true,
-      cleanOnceBeforeBuildPatterns: [ commonPaths.outputPath ]
+      cleanOnceBeforeBuildPatterns: [ commonPaths.outputPath ],
+      dangerouslyAllowCleanPatternsOutsideProject: true,
     }),
     new CopyWebpackPlugin([
       {

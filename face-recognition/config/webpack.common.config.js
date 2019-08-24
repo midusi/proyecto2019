@@ -78,7 +78,8 @@ const config = {
     new ExtractTextWebpackPlugin('styles.css'),
     new CleanWebpackPlugin({
       verbose: true,
-      cleanOnceBeforeBuildPatterns: [ commonPaths.outputPath ]
+      cleanOnceBeforeBuildPatterns: [ commonPaths.outputPath ],
+      dangerouslyAllowCleanPatternsOutsideProject: true,
     }),
     new CopyWebpackPlugin([
       {

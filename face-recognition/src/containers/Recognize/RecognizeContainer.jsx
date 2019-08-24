@@ -6,9 +6,6 @@ import * as faceapi from 'face-api.js'
 
 import WebCamPicture from 'src/components/WebCamPicture'
 
-import ReactChartkick, { ColumnChart } from 'react-chartkick'
-import Chart from 'chart.js'
-
 import {
   MODEL_URL,
   MIN_CONFIDENCE,
@@ -46,8 +43,6 @@ class RecognizeContainer extends Component {
     this.landmarkWebCamPicture = this.landmarkWebCamPicture.bind(this)
     this.runRecognition = this.runRecognition.bind(this)
     this.resetRecognition = this.resetRecognition.bind(this)
-
-    ReactChartkick.addAdapter(Chart)
   }
 
   async componentDidMount() {
@@ -179,7 +174,7 @@ class RecognizeContainer extends Component {
       trans,
     } = this.props
 
-    void trans
+    void trans, faceExpresions
 
     return (
       <Container text>
@@ -220,9 +215,6 @@ class RecognizeContainer extends Component {
             <Grid.Row>
               <Grid.Column>
                 <canvas ref={this.canvasFace} width={350} height={350} />
-              </Grid.Column>
-              <Grid.Column>
-                { !Array.from(faceExpresions || []).length ? null : <ColumnChart data={faceExpresions} />}
               </Grid.Column>
             </Grid.Row>
           </Grid>
