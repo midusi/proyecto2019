@@ -11,7 +11,7 @@ import {
   ON_SCORE_FORM_FIELD_CHANGE,
 } from 'src/constants'
 
-import backend from 'src/lib/fake-backend'
+import backend from 'src/helpers/fake-backend'
 
 export const onScoreFormClear = () => ({
   type: ON_SCORE_FORM_CLEAR,
