@@ -24,16 +24,16 @@ class WebCamPicure extends Component {
 
   render() {
     const {
-      videoConstraints
+      videoConstraints,
+      ...rest
     } = this.props
 
     return (
       <Webcam
         audio={false}
-        height={350}
         ref={this.webcam}
         screenshotFormat="image/jpeg"
-        width={350}
+        {...rest}
         videoConstraints={videoConstraints}
       />
     )

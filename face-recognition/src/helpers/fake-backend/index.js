@@ -1,4 +1,3 @@
-import _ from 'underscore'
 import { asyncLocalStorage } from 'src/helpers/local-storage'
 
 const getScores = () => 

@@ -1,19 +1,14 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import { Container, Segment, Grid, Button } from 'semantic-ui-react'
-
+import React, { Component, Fragment } from 'react'
 import * as faceapi from 'face-api.js'
-
 import WebCamPicture from 'src/components/WebCamPicture'
-
-import ReactChartkick, { ColumnChart } from 'react-chartkick'
-import Chart from 'chart.js'
-
+import { withWindowDimensions } from 'src/helpers/window-size'
 import {
   MODEL_URL,
   MIN_CONFIDENCE,
   INPUT_SIZE,
   MIN_PROBABILITY,
+  SCORE_WIDTH,
+  SCORE_HEIGHT,
 } from 'src/config/recognition'
 
 import {
@@ -23,7 +18,7 @@ import {
   generateBoxWithXCentroid
 } from 'src/helpers/math'
 
-class RecognizeContainer extends Component {
+class GameStepContainer extends Component {
   static async loadModels() {
     await faceapi.loadTinyFaceDetectorModel(MODEL_URL)
     await faceapi.loadFaceExpressionModel(MODEL_URL)
@@ -35,7 +30,7 @@ class RecognizeContainer extends Component {
 
     this.state = {
       recognize: false,
-      faceExpresions: []
+      faceExpresions: [],
     }
 
     this.fullFaceDescriptions = null
@@ -50,9 +45,9 @@ class RecognizeContainer extends Component {
   }
 
   async componentDidMount() {
-    await RecognizeContainer.loadModels()
+    await GameStepContainer.loadModels()
     
-    ReactChartkick.addAdapter(Chart)
+    setInterval(() => this.runRecognition(), 5000)
   }
 
   async getFullFaceDescription(canvas) {
@@ -66,8 +61,6 @@ class RecognizeContainer extends Component {
       .withFaceLandmarks()
       .withFaceExpressions()
 
-    console.log(this.fullFaceDescriptions)
-    
     if (this.fullFaceDescriptions && this.fullFaceDescriptions[0]) {
       const { landmarks, expressions } = this.fullFaceDescriptions[0]
 
@@ -117,50 +110,29 @@ class RecognizeContainer extends Component {
     this.canvasFace.current.height = desiredFaceHeight
 
     // draw the clipped image from the main canvas to the new canvas
-    ctxFace.drawImage(offscreen.transferToImageBitmap(), points[0].x, points[0].y, desiredFaceWidth, desiredFaceHeight, 
-      0, 0, desiredFaceWidth,desiredFaceHeight)
+    ctxFace.drawImage(
+      offscreen.transferToImageBitmap(),
+      points[0].x, points[0].y,
+      desiredFaceWidth, desiredFaceHeight, 
+      0, 0,
+      desiredFaceWidth,desiredFaceHeight
+    )
   }
 
   drawDescription(canvas) {
-    const drawableDetections = this.fullFaceDescriptions
-      .map(({ detection }) => detection)
-      .map(fd => fd.box)
-
-    const drawableExpressions = this.fullFaceDescriptions
-      .map(({ detection, expressions }) => ({
-        position: detection.box,
-        expressions,
-      }))
-
-    faceapi.draw.drawDetections(canvas, drawableDetections)
-    faceapi.draw.drawFaceExpressions(canvas, drawableExpressions, MIN_PROBABILITY)
-  }
-
-  landmarkWebCamPicture(picture) {
-    const ctx = this.canvasPicWebCam.current.getContext('2d')
-    
-    const image = new Image()
-    
-    image.onload = async () => {
-      ctx.drawImage(image, 0, 0)
-      
-      await this.getFullFaceDescription(this.canvasPicWebCam.current)
-
-      if (this.fullFaceDescriptions[0]) {
-        this.extractFaces(image)
-        this.drawDescription(this.canvasPicWebCam.current)
-      }
-    }
-    
-    image.src = picture
+    faceapi.draw.drawDetections(canvas, this.fullFaceDescriptions.map(({ detection }) => detection))
+    faceapi.draw.drawFaceExpressions(canvas, this.fullFaceDescriptions, MIN_PROBABILITY)
   }
 
   runRecognition() {
+    if (!this.webCamPicture.current)
+      return
+
+    this.webCamPicture.current.capture()
+    
     this.setState(() => ({
       recognize: true,
     }))
-
-    this.webCamPicture.current.capture()
   }
 
   resetRecognition() {
@@ -171,73 +143,73 @@ class RecognizeContainer extends Component {
     this.fullFaceDescriptions = null
   }
 
-  render() {
+  landmarkWebCamPicture(picture) {
     const {
-      recognize,
-      faceExpresions
-    } = this.state
-
-    const {
-      trans,
+      match: {
+        params: {
+          expression,
+        }
+      },
+      handleRecognition,
     } = this.props
 
-    void trans
+    const ctx = this.canvasPicWebCam.current.getContext('2d')
+
+    const image = new Image()
+    
+    image.onload = async () => {
+      ctx.drawImage(image, 0, 0)
+
+      await this.getFullFaceDescription(this.canvasPicWebCam.current)
+
+      if (this.fullFaceDescriptions[0]) {
+        this.extractFaces(image)
+        this.drawDescription(this.canvasPicWebCam.current)
+        
+        handleRecognition(expression, this.canvasFace.current.toDataURL(), 1)
+      }
+    }
+    
+    image.src = picture
+  }
+
+  render() {
+    const { recognize, faceExpresions } = this.state
+    const { windowHeight, windowWidth } = this.props
+    
+    void recognize, faceExpresions
 
     return (
-      <Container text>
-        <Segment placeholder>
-          <Grid columns={2}>
-            <Grid.Row>
-              <Grid.Column>
-                <canvas
-                  ref={this.canvasPicWebCam}
-                  width={350}
-                  height={350}
-                  style={{ display: recognize ? undefined : 'none' }}
-                />
-
-                { recognize ? null : (
-                  <WebCamPicture
-                    ref={this.webCamPicture}
-                    landmarkPicture={this.landmarkWebCamPicture}
-                    height={350}
-                    width={350}
-                    videoConstraints={{
-                      width: 350,
-                      height: 350,
-                      facingMode: 'user',
-                    }}
-                  />
-                )}
-              </Grid.Column>
-              <Grid.Column verticalAlign='middle'>
-                <Button 
-                  circular
-                  icon='camera'
-                  color='red'
-                  basic
-                  size='huge'
-                  onClick={recognize ? this.resetRecognition : this.runRecognition}
-                />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Column>
-                <canvas ref={this.canvasFace} width={350} height={350} />
-              </Grid.Column>
-              <Grid.Column>
-                { !Array.from(faceExpresions || []).length ? null : <ColumnChart data={faceExpresions} />}
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </Segment>
-      </Container>
+      <Fragment>
+        <canvas
+          ref={this.canvasPicWebCam}
+          width={windowWidth}
+          height={windowHeight}
+          style={{ display: recognize ? undefined : 'none' }}
+        />
+        {recognize ? null : (
+          <WebCamPicture
+            ref={this.webCamPicture}
+            landmarkPicture={this.landmarkWebCamPicture}
+            height={windowHeight}
+            width={windowWidth}
+            videoConstraints={{
+              height: windowHeight,
+              width: windowWidth,
+              facingMode: 'user',
+            }}
+          />
+        )}
+        <canvas
+          style={{ visibility: 'hidden' }}
+          ref={this.canvasFace}
+          width={SCORE_WIDTH}
+          height={SCORE_HEIGHT}
+        />
+      </Fragment>
+      
     )
   }
 }
 
-RecognizeContainer.propTypes = {
-  trans: PropTypes.func.isRequired,
-}
-
-export default RecognizeContainer
+export default withWindowDimensions(GameStepContainer)

@@ -37,15 +37,19 @@ export const addScore = () => (dispatch, getState) => {
   const {
     score: {
       form: {
-        fields: score,
+        fields: {
+          expression,
+          probability,
+          image,
+        },
       }
     }
   } = getState()
 
   dispatch({ type: SCORE_ADD_REQUEST })
-  return backend.addTask(score)
+  return backend.addScore({ expression, probability, image })
     .then(() => {
-      dispatch({ type: SCORE_ADD_SUCCESS, payload: score })
+      dispatch({ type: SCORE_ADD_SUCCESS, payload: { expression, probability, image } })
       dispatch(getScores())
     })
     .catch(err => {
