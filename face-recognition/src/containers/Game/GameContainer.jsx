@@ -3,6 +3,7 @@ import React, { Component, Fragment } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { Modal, Icon, Image, Header, Button, Rating } from 'semantic-ui-react'
 
 import GameRoutes from 'src/routes/game'
 import { supportedExpressions as expressions } from 'src/config/recognition'
@@ -33,11 +34,20 @@ class GamePage extends Component {
   }
 
   handleNextStep() {
+    const { expressions } = this.state
+    const {
+      history,
+    } = this.props
+
+    if (_.isEmpty(expressions)) {
+      history.push('/game/summary')
+    }
+
     this.setState(state => {
       const { expressions } = state
 
       return {
-        expressions: expressions.slice(1)
+        expressions: expressions.slice(1),
       }
     })
   }
@@ -50,8 +60,6 @@ class GamePage extends Component {
       }
     } = this.props
 
-    console.log(expression)
-
     onScoreFormFieldChange('expression', expression)
     onScoreFormFieldChange('probability', probability)
     onScoreFormFieldChange('image', image)
@@ -60,16 +68,51 @@ class GamePage extends Component {
   }
 
   render() {
-    const { t, trans } = this.props
+    const {
+      t,
+      trans,
+      history,
+      score: {
+        form: {
+          fields: {
+            image,
+            expression,
+            probability,
+          }
+        }
+      },
+    } = this.props
 
     return (
       <Fragment>
         <GameRoutes
           t={t}
           trans={trans}
-          handleNextStep={this.handleNextStep}
+          history={history}
           handleRecognition={this.handleRecognition}
         />
+        <Modal dimmer='blurring' open={!!image}>
+          <Modal.Header>{trans('recognize:winner')}</Modal.Header>
+          <Modal.Content image>
+            <Image wrapped size='medium' src={image} />
+            <Modal.Description>
+              <Header>{expression}</Header>
+              <Rating
+                icon='star'
+                size='massive'
+                maxRating={5}
+                defaultRating={probability*5}
+                rating={probability*5}
+              />
+            </Modal.Description>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button color='blue' onClick={this.handleNextStep}>
+              {trans('recognize:options.next')}
+              <Icon name='chevron right' />
+            </Button>
+          </Modal.Actions>
+        </Modal>
       </Fragment>
     )
   }  

@@ -11,6 +11,7 @@ import {
   SCORE_HEIGHT,
 } from 'src/config/recognition'
 
+import { winner } from 'src/helpers/face'
 import {
   centroid,
   slope,
@@ -56,13 +57,23 @@ class GameStepContainer extends Component {
       scoreThreshold: MIN_CONFIDENCE
     })
 
+    const {
+      match: {
+        params: {
+          expression,
+        }
+      }
+    } = this.props
+
+    const winnerForExpression = winner(expression)
+
     this.fullFaceDescriptions = await faceapi
       .detectAllFaces(canvas, options)
       .withFaceLandmarks()
       .withFaceExpressions()
 
-    if (this.fullFaceDescriptions && this.fullFaceDescriptions[0]) {
-      const { landmarks, expressions } = this.fullFaceDescriptions[0]
+    if (this.fullFaceDescriptions && winnerForExpression(this.fullFaceDescriptions)) {
+      const { landmarks, expressions } = winnerForExpression(this.fullFaceDescriptions)
 
       this.rightEyeCentroid = centroid(landmarks.getRightEye())
       this.leftEyeCentroid = centroid(landmarks.getLeftEye())
@@ -162,12 +173,21 @@ class GameStepContainer extends Component {
 
       await this.getFullFaceDescription(this.canvasPicWebCam.current)
 
-      if (this.fullFaceDescriptions[0]) {
-        this.extractFaces(image)
-        this.drawDescription(this.canvasPicWebCam.current)
-        
-        handleRecognition(expression, this.canvasFace.current.toDataURL(), 1)
+      const winnerDescription = winner(expression)(this.fullFaceDescriptions)
+
+      if (!(winnerDescription && winnerDescription.expressions[expression] > MIN_PROBABILITY)) {
+        this.resetRecognition()
+        return
       }
+
+      this.extractFaces(image)
+      this.drawDescription(this.canvasPicWebCam.current)
+      
+      handleRecognition(
+        expression,
+        this.canvasFace.current.toDataURL(),
+        winnerDescription.expressions[expression]
+      )
     }
     
     image.src = picture
