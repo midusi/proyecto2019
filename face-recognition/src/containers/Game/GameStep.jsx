@@ -158,10 +158,10 @@ class GameStepContainer extends Component {
 
   landmarkWebCamPicture(picture) {
     const {
+      handleRecognition,
       expression: {
         name: expression,
       },
-      handleRecognition,
     } = this.props
 
     const ctx = this.canvasPicWebCam.current.getContext('2d')

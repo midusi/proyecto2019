@@ -3,6 +3,10 @@ import {
   SCORES_GET_SUCCESS,
   SCORES_GET_FAILURE,
 
+  SCORES_CLEAR_REQUEST,
+  SCORES_CLEAR_SUCCESS,
+  SCORES_CLEAR_FAILURE,
+
   SCORE_ADD_REQUEST,
   SCORE_ADD_SUCCESS,
   SCORE_ADD_FAILURE,
@@ -30,6 +34,17 @@ export const getScores = () => dispatch => {
     })
     .catch(err => {
       dispatch({ type: SCORES_GET_FAILURE, payload: err })
+    })
+}
+
+export const clearScores = () => dispatch => {
+  dispatch({ type: SCORES_CLEAR_REQUEST })
+  return backend.clearScores()
+    .then(scores => {
+      dispatch({ type: SCORES_CLEAR_SUCCESS, payload: scores })
+    })
+    .catch(err => {
+      dispatch({ type: SCORES_CLEAR_FAILURE, payload: err })
     })
 }
 
@@ -61,5 +76,6 @@ export default {
   onScoreFormClear,
   onScoreFormFieldChange,
   getScores,
+  clearScores,
   addScore,
 }

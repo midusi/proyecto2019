@@ -4,10 +4,11 @@ export const INPUT_SIZE = 320
 export const MIN_PROBABILITY = 0.9
 export const SCORE_WIDTH = 350
 export const SCORE_HEIGHT = 350
+export const STEPS = 5
 
 export const expressions = [{
   name: 'neutral',
-  icon: 'meh',  
+  icon: 'meh',
 }, {
   name: 'happy',
   icon: 'smile',

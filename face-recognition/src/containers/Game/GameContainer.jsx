@@ -6,15 +6,18 @@ import PropTypes from 'prop-types'
 import { Modal, Icon, Image, Header, Button, Rating } from 'semantic-ui-react'
 
 import GameRoutes from 'src/routes/game'
-import { supportedExpressions as expressions } from 'src/config/recognition'
 import * as scoreActions from 'src/actions/score-actions'
+import {
+  STEPS,
+  supportedExpressions as expressions,
+} from 'src/config/recognition'
 
 class GamePage extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      expressions: _.shuffle(expressions),
+      expressions: _.shuffle(_.sample(expressions, STEPS)),
     }
 
     this.handleNextStep = this.handleNextStep.bind(this)
@@ -90,6 +93,8 @@ class GamePage extends Component {
         }
       },
     } = this.props
+
+    console.log(this.state)
 
     return (
       <Fragment>
