@@ -1,5 +1,8 @@
 import React, { Component, Fragment } from 'react'
+import { Redirect } from 'react-router-dom'
 import * as faceapi from 'face-api.js'
+import { Button } from 'semantic-ui-react'
+
 import WebCamPicture from 'src/components/WebCamPicture'
 import { withWindowDimensions } from 'src/helpers/window-size'
 import {
@@ -9,6 +12,7 @@ import {
   MIN_PROBABILITY,
   SCORE_WIDTH,
   SCORE_HEIGHT,
+  supportedExpressions,
 } from 'src/config/recognition'
 
 import { winner } from 'src/helpers/face'
@@ -58,10 +62,8 @@ class GameStepContainer extends Component {
     })
 
     const {
-      match: {
-        params: {
-          expression,
-        }
+      expression: {
+        name: expression,
       }
     } = this.props
 
@@ -96,7 +98,7 @@ class GameStepContainer extends Component {
     const dist = distance(this.rightEyeCentroid, this.leftEyeCentroid)
     const desiredDist = (desiredRightEyeX - desiredLeftEye.x) * desiredFaceWidth
     
-    const scale = desiredDist / dist
+    const scale = desiredDist/dist
 
     // generate the box
     const eyesCentroid = centroid([this.leftEyeCentroid, this.rightEyeCentroid])
@@ -156,10 +158,8 @@ class GameStepContainer extends Component {
 
   landmarkWebCamPicture(picture) {
     const {
-      match: {
-        params: {
-          expression,
-        }
+      expression: {
+        name: expression,
       },
       handleRecognition,
     } = this.props
@@ -195,12 +195,27 @@ class GameStepContainer extends Component {
 
   render() {
     const { recognize, faceExpresions } = this.state
-    const { windowHeight, windowWidth } = this.props
+    const {
+      windowHeight,
+      windowWidth,
+      expression: {
+        icon,
+      },
+    } = this.props
     
-    void recognize, faceExpresions
+    void faceExpresions
 
     return (
       <Fragment>
+        <Button
+          size='huge'
+          icon={icon}
+          color='orange'
+          circular
+          basic
+          floated='left'
+          style={{ position: 'absolute' }}
+        />
         <canvas
           ref={this.canvasPicWebCam}
           width={windowWidth}
@@ -232,4 +247,20 @@ class GameStepContainer extends Component {
   }
 }
 
-export default withWindowDimensions(GameStepContainer)
+export default withWindowDimensions(props => {
+  const {
+    match: {
+      params: {
+        expression,
+      }
+    }
+  } = props
+
+  const found = supportedExpressions.find(expr => expr.name === expression)
+
+  if (!found) {
+    return <Redirect to='/game' />
+  }
+
+  return <GameStepContainer {...props} expression={found} />
+})
