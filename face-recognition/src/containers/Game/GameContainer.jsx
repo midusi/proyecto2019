@@ -37,18 +37,27 @@ class GamePage extends Component {
     const { expressions } = this.state
     const {
       history,
+      actions: {
+        onScoreFormClear,
+      }
     } = this.props
 
     if (_.isEmpty(expressions)) {
       history.push('/game/summary')
+      return
     }
 
-    this.setState(state => {
-      const { expressions } = state
+    const [current, ...rest] = expressions
 
-      return {
-        expressions: expressions.slice(1),
-      }
+    this.setState({
+      expressions: rest,
+    })
+
+    onScoreFormClear()
+
+    history.replace('/game/step')
+    setTimeout(() => {
+      history.push(`/game/step/${current.name}`)
     })
   }
 
@@ -71,7 +80,6 @@ class GamePage extends Component {
     const {
       t,
       trans,
-      history,
       score: {
         form: {
           fields: {
@@ -88,7 +96,7 @@ class GamePage extends Component {
         <GameRoutes
           t={t}
           trans={trans}
-          history={history}
+          handleNextStep={this.handleNextStep}
           handleRecognition={this.handleRecognition}
         />
         <Modal dimmer='blurring' open={!!image}>
@@ -101,7 +109,6 @@ class GamePage extends Component {
                 icon='star'
                 size='massive'
                 maxRating={5}
-                defaultRating={probability*5}
                 rating={probability*5}
               />
             </Modal.Description>

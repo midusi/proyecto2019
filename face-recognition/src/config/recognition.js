@@ -14,6 +14,7 @@ export const expressions = [{
 }, {
   name: 'sad',
   icon: 'sad-tear',
+  disabled: true,
 }, {
   name: 'angry',
   icon: 'angry',

@@ -60,7 +60,6 @@ class GameSummaryPage extends Component {
               icon='star'
               size='massive'
               maxRating={5}
-              defaultRating={score.probability*5}
               rating={score.probability*5}
             />
           )}
