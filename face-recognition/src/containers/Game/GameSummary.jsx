@@ -1,9 +1,12 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Button, Container, Card, Divider, Rating, Responsive } from 'semantic-ui-react'
 import Slider from 'react-slick'
+
+import WebCamPicture from 'src/components/WebCamPicture'
+import { withWindowDimensions } from 'src/helpers/window-size'
 import * as scoreActions from 'src/actions/score-actions'
 
 class GameSummaryPage extends Component {
@@ -23,6 +26,8 @@ class GameSummaryPage extends Component {
     const {
       trans,
       history,
+      windowHeight,
+      windowWidth,
       score: {
         collections: {
           scores,
@@ -68,43 +73,68 @@ class GameSummaryPage extends Component {
     ))
 
     return (
-      <Container style={{ paddingTop: '75px' }}>
-        <Responsive {...Responsive.onlyMobile}>
-          <Slider
-            {...settings}
-            slidesToShow={1}
-            slidesToScroll={1}
-          >
-            {scoresList}
-          </Slider>
-        </Responsive>
-        <Responsive {...Responsive.onlyTablet}>
-          <Slider
-            {...settings}
-            slidesToShow={arrayedScores.length < 3 ? arrayedScores.length : 2}
-            slidesToScroll={2}
-          >
-            {scoresList}
-          </Slider>
-        </Responsive>
-        <Responsive minWidth={Responsive.onlyComputer.minWidth}>
-          <Slider
-            {...settings}
-            slidesToShow={arrayedScores.length < 4 ? arrayedScores.length : 3}
-            slidesToScroll={3}
-          >
-            {scoresList}
-          </Slider>
-        </Responsive>
-        <Divider hidden />
-        <Button
-          floated='right'
-          color='blue'
-          onClick={() => history.push('/')}
+      <Fragment>
+        <WebCamPicture
+          style={{
+            '-webkit-filter': 'blur(8px)',
+            '-moz-filter': 'blur(8px)',
+            '-ms-filter': 'blur(8px)',
+            '-o-filter': 'blur(8px)',
+            filter: 'blur(8px)',
+          }}
+          height={windowHeight}
+          width={windowWidth}
+          videoConstraints={{
+            height: windowHeight,
+            width: windowWidth,
+            facingMode: 'user',
+          }}
+        />
+        <Container
+          style={{
+            paddingTop: '75px',
+            position: 'absolute',
+            top: '10%',
+            right: '10%',
+          }}
         >
-          {trans('recognize:home')}
-        </Button>
-      </Container>
+          <Responsive {...Responsive.onlyMobile}>
+            <Slider
+              {...settings}
+              slidesToShow={1}
+              slidesToScroll={1}
+            >
+              {scoresList}
+            </Slider>
+          </Responsive>
+          <Responsive {...Responsive.onlyTablet}>
+            <Slider
+              {...settings}
+              slidesToShow={arrayedScores.length < 3 ? arrayedScores.length : 2}
+              slidesToScroll={2}
+            >
+              {scoresList}
+            </Slider>
+          </Responsive>
+          <Responsive minWidth={Responsive.onlyComputer.minWidth}>
+            <Slider
+              {...settings}
+              slidesToShow={arrayedScores.length < 4 ? arrayedScores.length : 3}
+              slidesToScroll={3}
+            >
+              {scoresList}
+            </Slider>
+          </Responsive>
+          <Divider hidden />
+          <Button
+            floated='right'
+            color='blue'
+            onClick={() => history.push('/')}
+          >
+            {trans('recognize:home')}
+          </Button>
+        </Container>
+      </Fragment>
     )
   }  
 }
@@ -129,4 +159,4 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(GameSummaryPage)
+export default withWindowDimensions(connect(mapStateToProps, mapDispatchToProps)(GameSummaryPage))
