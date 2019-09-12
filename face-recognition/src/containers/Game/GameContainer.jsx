@@ -28,12 +28,12 @@ class GamePage extends Component {
     const {
       actions: {
         onScoreFormClear,
-        getScores,
+        clearScores,
       }
     } = this.props
 
     onScoreFormClear()
-    getScores()
+    clearScores()
   }
 
   handleNextStep() {
