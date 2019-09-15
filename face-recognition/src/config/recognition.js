@@ -9,9 +9,13 @@ export const STEPS = 5
 export const expressions = [{
   name: 'neutral',
   icon: 'meh',
+  minHigh: 0.96,
+  maxHigh: 1
 }, {
   name: 'happy',
   icon: 'smile',
+  minHigh: 0.96,
+  maxHigh: 1
 }, {
   name: 'sad',
   icon: 'sad-tear',
@@ -19,6 +23,8 @@ export const expressions = [{
 }, {
   name: 'angry',
   icon: 'angry',
+  minHigh: 0.96,
+  maxHigh: 1
 }, {
   name: 'fearfull',
   icon: '', 

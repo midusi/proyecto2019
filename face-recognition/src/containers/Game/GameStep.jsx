@@ -34,11 +34,11 @@ class GameStepContainer extends Component {
     super(props)
 
     this.state = {
-      recognize: false,
       faceExpresions: [],
     }
 
     this.fullFaceDescriptions = null
+    this.winnerDescription = null
 
     this.webCamPicture = React.createRef()
     this.canvasPicWebCam = React.createRef()
@@ -47,12 +47,15 @@ class GameStepContainer extends Component {
     this.landmarkWebCamPicture = this.landmarkWebCamPicture.bind(this)
     this.runRecognition = this.runRecognition.bind(this)
     this.resetRecognition = this.resetRecognition.bind(this)
+    this.endStep = this.endStep.bind(this)
+    this.drawBox = this.drawBox.bind(this)
   }
 
   async componentDidMount() {
     await GameStepContainer.loadModels()
     
-    setInterval(() => this.runRecognition(), 5000)
+    setInterval(() => this.runRecognition(), 10)
+    setTimeout(() => this.endStep(), 5000)
   }
 
   async getFullFaceDescription(canvas) {
@@ -132,9 +135,40 @@ class GameStepContainer extends Component {
     )
   }
 
-  drawDescription(canvas) {
-    faceapi.draw.drawDetections(canvas, this.fullFaceDescriptions.map(({ detection }) => detection))
-    faceapi.draw.drawFaceExpressions(canvas, this.fullFaceDescriptions, MIN_PROBABILITY)
+  drawBox(canvas, box, confidence){
+    const {
+      expression: {
+        minHigh: minHigh,
+        maxHigh: maxHigh
+      },
+    } = this.props
+
+    let ctx = canvas.getContext('2d')
+    const lineWidth = 2
+    const initialColor = 0x40
+    const finalColor = 0xFF
+    let color = '#' + initialColor.toString(16) + '0000'
+    if (confidence > minHigh){
+      let ratio = (confidence - minHigh)/(maxHigh - minHigh)
+      if (ratio > 1) ratio = 1
+      let intensity = Math.floor(initialColor + (finalColor - initialColor)*ratio)
+      color = '#' + intensity.toString(16) + '0000'  
+    }
+    ctx.strokeStyle = color
+    ctx.lineWidth = lineWidth
+    ctx.strokeRect(box.x, box.y, box.width, box.height)
+  }
+
+  drawDescription(canvas, expression) {
+    // faceapi.draw.drawDetections(canvas, this.fullFaceDescriptions.map(({ detection }) => detection))
+    // faceapi.draw.drawFaceExpressions(canvas, this.fullFaceDescriptions, MIN_PROBABILITY)
+    this.fullFaceDescriptions.forEach(
+      ({ detection, expressions }) => {
+        if(expressions[expression] > MIN_PROBABILITY){
+          GameStepContainer.drawBox(canvas, detection.box, expressions[expression])
+        }
+      }
+    )
   }
 
   runRecognition() {
@@ -143,20 +177,14 @@ class GameStepContainer extends Component {
 
     this.webCamPicture.current.capture()
     
-    this.setState(() => ({
-      recognize: true,
-    }))
   }
 
   resetRecognition() {
-    this.setState(() => ({
-      recognize: false,
-    }))
 
-    this.fullFaceDescriptions = null
+    setTimeout(() => this.endStep(), 5000)
   }
 
-  landmarkWebCamPicture(picture) {
+  endStep(){
     const {
       handleRecognition,
       expression: {
@@ -164,37 +192,52 @@ class GameStepContainer extends Component {
       },
     } = this.props
 
+    if (!(this.winnerDescription && this.winnerDescription.expressions[expression] > MIN_PROBABILITY)) {
+      this.resetRecognition()
+      return
+    }
+
+    handleRecognition(
+      expression,
+      this.canvasFace.current.toDataURL(),
+      this.winnerDescription.expressions[expression]
+    )
+
+  }
+
+  landmarkWebCamPicture(picture) {
+    const {
+      expression: {
+        name: expression,
+      },
+    } = this.props
+    
     const ctx = this.canvasPicWebCam.current.getContext('2d')
 
     const image = new Image()
-    
+
     image.onload = async () => {
       ctx.drawImage(image, 0, 0)
-
       await this.getFullFaceDescription(this.canvasPicWebCam.current)
 
-      const winnerDescription = winner(expression)(this.fullFaceDescriptions)
+      if (this.fullFaceDescriptions && this.fullFaceDescriptions.length){
+        let frameWinnerDescription = winner(expression)(this.fullFaceDescriptions)
 
-      if (!(winnerDescription && winnerDescription.expressions[expression] > MIN_PROBABILITY)) {
-        this.resetRecognition()
-        return
+        if (!this.winnerDescription || (frameWinnerDescription && frameWinnerDescription.expressions[expression] > this.winnerDescription.expressions[expression])){
+          this.winnerDescription = frameWinnerDescription
+        }
+
+        this.extractFaces(image)
+        this.drawDescription(this.canvasPicWebCam.current, expression)  
       }
 
-      this.extractFaces(image)
-      this.drawDescription(this.canvasPicWebCam.current)
-      
-      handleRecognition(
-        expression,
-        this.canvasFace.current.toDataURL(),
-        winnerDescription.expressions[expression]
-      )
     }
-    
+
     image.src = picture
   }
 
   render() {
-    const { recognize, faceExpresions } = this.state
+    const { faceExpresions } = this.state
     const {
       windowHeight,
       windowWidth,
@@ -207,6 +250,24 @@ class GameStepContainer extends Component {
 
     return (
       <Fragment>
+        <WebCamPicture
+          ref={this.webCamPicture}
+          landmarkPicture={this.landmarkWebCamPicture}
+          height={windowHeight}
+          width={windowWidth}
+          videoConstraints={{
+            height: windowHeight,
+            width: windowWidth,
+            facingMode: 'user',
+          }}
+          style={{ position: 'absolute' }}
+        />
+        <canvas
+          ref={this.canvasPicWebCam}
+          width={windowWidth}
+          height={windowHeight}
+          style={{ position: 'absolute' }}
+        />
         <Button
           size='huge'
           icon={icon}
@@ -216,25 +277,6 @@ class GameStepContainer extends Component {
           floated='left'
           style={{ position: 'absolute' }}
         />
-        <canvas
-          ref={this.canvasPicWebCam}
-          width={windowWidth}
-          height={windowHeight}
-          style={{ display: recognize ? undefined : 'none' }}
-        />
-        {recognize ? null : (
-          <WebCamPicture
-            ref={this.webCamPicture}
-            landmarkPicture={this.landmarkWebCamPicture}
-            height={windowHeight}
-            width={windowWidth}
-            videoConstraints={{
-              height: windowHeight,
-              width: windowWidth,
-              facingMode: 'user',
-            }}
-          />
-        )}
         <canvas
           style={{ visibility: 'hidden' }}
           ref={this.canvasFace}
