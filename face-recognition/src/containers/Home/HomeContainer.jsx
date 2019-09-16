@@ -25,7 +25,7 @@ const HomeContainer = props => {
         <Divider hidden />
         <Button
           as={Link}
-          to='/recognize'
+          to='/game'
           basic
           inverted
           color='blue'

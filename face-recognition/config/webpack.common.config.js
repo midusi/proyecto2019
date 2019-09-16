@@ -1,6 +1,6 @@
 const webpack = require('webpack')
 const path = require('path')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin')
 
@@ -76,8 +76,10 @@ const config = {
   plugins: [
     new webpack.ProgressPlugin(),
     new ExtractTextWebpackPlugin('styles.css'),
-    new CleanWebpackPlugin([commonPaths.outputPath], {
-      root: commonPaths.root
+    new CleanWebpackPlugin({
+      verbose: true,
+      cleanOnceBeforeBuildPatterns: [ commonPaths.outputPath ],
+      dangerouslyAllowCleanPatternsOutsideProject: true,
     }),
     new CopyWebpackPlugin([
       {

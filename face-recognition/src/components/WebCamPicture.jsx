@@ -12,6 +12,18 @@ class WebCamPicure extends Component {
     this.interval = null
   }
 
+  componentDidMount() {
+    const {
+      refreshTime,
+    } = this.props
+
+    this.interval = setInterval(this.capture, refreshTime)
+  }
+  
+  componentWillUnmount() {
+    clearInterval(this.interval)
+  }
+
   capture() {
     const {
       landmarkPicture,
@@ -24,16 +36,16 @@ class WebCamPicure extends Component {
 
   render() {
     const {
-      videoConstraints
+      videoConstraints,
+      ...rest
     } = this.props
 
     return (
       <Webcam
         audio={false}
-        height={350}
         ref={this.webcam}
         screenshotFormat="image/jpeg"
-        width={350}
+        {...rest}
         videoConstraints={videoConstraints}
       />
     )

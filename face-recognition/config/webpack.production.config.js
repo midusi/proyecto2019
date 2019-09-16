@@ -1,4 +1,4 @@
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
 
@@ -12,16 +12,15 @@ const config = {
     path: commonPaths.outputServerPath,
     publicPath: '/proyecto2019/'
   },
-  devtool: 'source-map',
   mode: 'production',
   plugins: [
     new TerserWebpackPlugin({
       sourceMap: true
     }),
-    new CleanWebpackPlugin([
-      commonPaths.outputServerPath
-    ], {
-      root: commonPaths.root
+    new CleanWebpackPlugin({
+      verbose: true,
+      cleanOnceBeforeBuildPatterns: [ commonPaths.outputPath ],
+      dangerouslyAllowCleanPatternsOutsideProject: true,
     }),
     new CopyWebpackPlugin([
       {

@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
-import { reducer as formReducer } from 'redux-form'
+
+import scoreReducer from './score'
 
 export default combineReducers({
-  form: formReducer,
+  score: scoreReducer,
 })
