@@ -182,8 +182,8 @@ class GameStepContainer extends Component {
   resetRecognition() {
     this.setState(state => ({ patch: !state.patch }))
 
-    this.fullFaceDescriptions = null
-    this.faceImages = null
+    // this.fullFaceDescriptions = null
+    // this.faceImages = null
   }
 
   endStep() {
