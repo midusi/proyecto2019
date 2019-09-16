@@ -20,7 +20,7 @@ const render = (Component) => {
         <Router basename='/proyecto2019'>
           <I18n ns='translations'>
             {
-              (t, { i18n }) => <Component trans={t} i18n={i18n} />
+              (t, { i18n }) => <Component t={t} trans={t} i18n={i18n} />
             }
           </I18n>
         </Router>
@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 if (module.hot) {
   module.hot.accept('./routes/app', () => {
-    render(AppRoutes)
+    render(AppRoutes).catch()
 
-    render(require('src/routes/app'))
+    render(require('src/routes/app')).catch()
   })
 }

@@ -1,5 +1,11 @@
 {
     "webcam": "Captura Original",
     "capturedImages": "Reconocimiento",
-    "capturedFace": "Rostro capturado"
+    "capturedFace": "Rostro capturado",
+    "winner": "Ganador de la ronda",
+    "probability": "Puntaje",
+    "home": "Volver a empezar",
+    "options": {
+        "next": "Siguiente"
+    }
 }
