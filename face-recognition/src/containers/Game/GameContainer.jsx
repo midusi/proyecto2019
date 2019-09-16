@@ -58,8 +58,9 @@ class GamePage extends Component {
 
     onScoreFormClear()
 
-    history.push(`/game/step/${current.name}`)
+    history.replace('/game/step')
     setTimeout(() => {
+      history.push(`/game/step/${current.name}`)
     })
   }
 
