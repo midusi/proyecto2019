@@ -261,6 +261,8 @@ class GameStepContainer extends Component {
           refreshTime={REFRESH_TIME}
           height={windowHeight}
           width={windowWidth}
+          screenshotFormat="image/jpeg"
+          screenshotQuality={1}
           videoConstraints={{
             height: windowHeight,
             width: windowWidth,
