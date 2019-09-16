@@ -39,6 +39,7 @@ class GameStepContainer extends Component {
     this.state = {
       faceExpresions: [],
       leftTime: STEP_TIME,
+      patch: true,
     }
 
     this.fullFaceDescriptions = null
@@ -165,9 +166,7 @@ class GameStepContainer extends Component {
   drawDescription(canvas, expression) {
     this.fullFaceDescriptions.forEach(
       ({ detection, expressions }) => {
-        if(expressions[expression] > MIN_PROBABILITY) {
-          this.drawBox(canvas, detection.box, expressions[expression])
-        }
+        this.drawBox(canvas, detection.box, expressions[expression])
       }
     )
   }
@@ -181,7 +180,7 @@ class GameStepContainer extends Component {
   }
 
   resetRecognition() {
-    this.setState(state => ({ leftTime: state.leftTime + 1 }))
+    this.setState(state => ({ patch: !state.patch }))
 
     this.fullFaceDescriptions = null
     this.faceImages = null
@@ -196,8 +195,7 @@ class GameStepContainer extends Component {
     } = this.props
 
     if (!(this.winnerDescription && this.winnerDescription.expressions[expression] > MIN_PROBABILITY)) {
-      this.resetRecognition()
-      return
+      return this.resetRecognition()
     }
 
     handleRecognition(

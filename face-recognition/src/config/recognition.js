@@ -5,7 +5,7 @@ import neutral from 'src-static/images/expressions/neutral.png'
 import sad from 'src-static/images/expressions/sad.png'
 
 export const MODEL_URL = process.env.NODE_ENV === 'development' ? '/models' : '/proyecto2019/models'
-export const MIN_CONFIDENCE = 0.1
+export const MIN_CONFIDENCE = 0.6
 export const REFRESH_TIME = 10
 export const STEP_TIME = 5
 export const INPUT_SIZE = 320
@@ -27,6 +27,7 @@ export const expressions = [{
 }, {
   name: 'sad',
   image: sad,
+  disabled: true,
   minHigh: 0.8,
   maxHigh: 1,
 }, {
