@@ -60,6 +60,10 @@ class GameSummaryPage extends Component {
           image={score.image}
           header={score.expression}
           meta={trans('recognize:probability')}
+          style={{
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+          }}
           description={(
             <Rating
               icon='star'

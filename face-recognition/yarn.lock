@@ -9156,6 +9156,13 @@ react-chartkick@^0.3.2:
   dependencies:
     chartkick "^3.1.1"
 
+react-count-to@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/react-count-to/-/react-count-to-0.12.0.tgz#28c6a2cc47b1d47c6019b35f02752ff109f3ca00"
+  integrity sha512-zckT3EvkGvdM65X7mIMVDXtv0/pYI2wpNH6iSEE7M14F2jO2IbCBTuJ+GCifkriY/l493CF9qCH5J4hiel9hYQ==
+  dependencies:
+    prop-types "^15.5.8"
+
 react-dock@^0.2.4:
   version "0.2.4"
   resolved "https://registry.yarnpkg.com/react-dock/-/react-dock-0.2.4.tgz#e727dc7550b3b73116635dcb9c0e04d0b7afe17c"

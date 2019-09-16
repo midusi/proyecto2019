@@ -55,6 +55,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-chartkick": "^0.3.2",
+    "react-count-to": "^0.12.0",
     "react-dom": "^16.8.6",
     "react-hot-loader": "^4.9.0",
     "react-i18next": "7.9.0",

@@ -1,13 +1,16 @@
 import React, { Component, Fragment } from 'react'
 import { Redirect } from 'react-router-dom'
 import * as faceapi from 'face-api.js'
-import { Button } from 'semantic-ui-react'
+import { Image as ImageComponent, Statistic } from 'semantic-ui-react'
+import CountTo from 'react-count-to'
 
 import WebCamPicture from 'src/components/WebCamPicture'
 import { withWindowDimensions } from 'src/helpers/window-size'
 import {
   MODEL_URL,
   MIN_CONFIDENCE,
+  REFRESH_TIME,
+  STEP_TIME,
   INPUT_SIZE,
   MIN_PROBABILITY,
   SCORE_WIDTH,
@@ -54,8 +57,8 @@ class GameStepContainer extends Component {
   async componentDidMount() {
     await GameStepContainer.loadModels()
     
-    setInterval(() => this.runRecognition(), 10)
-    setTimeout(() => this.endStep(), 5000)
+    setInterval(() => this.runRecognition(), REFRESH_TIME)
+    
   }
 
   async getFullFaceDescription(canvas) {
@@ -135,7 +138,7 @@ class GameStepContainer extends Component {
     )
   }
 
-  drawBox(canvas, box, confidence){
+  drawBox(canvas, box, confidence) {
     const {
       expression: {
         minHigh: minHigh,
@@ -143,17 +146,19 @@ class GameStepContainer extends Component {
       },
     } = this.props
 
-    let ctx = canvas.getContext('2d')
-    const lineWidth = 2
-    const initialColor = 0x40
-    const finalColor = 0xFF
-    let color = '#' + initialColor.toString(16) + '0000'
-    if (confidence > minHigh){
+    const ctx = canvas.getContext('2d')
+    const lineWidth = 3
+    const initialColor = 0x0040
+    const finalColor = 0x00FF
+
+    let color = '#00' + initialColor.toString(16) + initialColor.toString(16)
+    if (confidence > minHigh) {
       let ratio = (confidence - minHigh)/(maxHigh - minHigh)
       if (ratio > 1) ratio = 1
       let intensity = Math.floor(initialColor + (finalColor - initialColor)*ratio)
-      color = '#' + intensity.toString(16) + '0000'  
+      color = '#00' + intensity.toString(16) + initialColor.toString(16)
     }
+
     ctx.strokeStyle = color
     ctx.lineWidth = lineWidth
     ctx.strokeRect(box.x, box.y, box.width, box.height)
@@ -164,8 +169,8 @@ class GameStepContainer extends Component {
     // faceapi.draw.drawFaceExpressions(canvas, this.fullFaceDescriptions, MIN_PROBABILITY)
     this.fullFaceDescriptions.forEach(
       ({ detection, expressions }) => {
-        if(expressions[expression] > MIN_PROBABILITY){
-          GameStepContainer.drawBox(canvas, detection.box, expressions[expression])
+        if(expressions[expression] > MIN_PROBABILITY) {
+          this.drawBox(canvas, detection.box, expressions[expression])
         }
       }
     )
@@ -180,11 +185,10 @@ class GameStepContainer extends Component {
   }
 
   resetRecognition() {
-
-    setTimeout(() => this.endStep(), 5000)
+    this.endStep()
   }
 
-  endStep(){
+  endStep() {
     const {
       handleRecognition,
       expression: {
@@ -220,10 +224,10 @@ class GameStepContainer extends Component {
       ctx.drawImage(image, 0, 0)
       await this.getFullFaceDescription(this.canvasPicWebCam.current)
 
-      if (this.fullFaceDescriptions && this.fullFaceDescriptions.length){
+      if (this.fullFaceDescriptions && this.fullFaceDescriptions.length) {
         let frameWinnerDescription = winner(expression)(this.fullFaceDescriptions)
 
-        if (!this.winnerDescription || (frameWinnerDescription && frameWinnerDescription.expressions[expression] > this.winnerDescription.expressions[expression])){
+        if (!this.winnerDescription || (frameWinnerDescription && frameWinnerDescription.expressions[expression] > this.winnerDescription.expressions[expression])) {
           this.winnerDescription = frameWinnerDescription
         }
 
@@ -242,7 +246,7 @@ class GameStepContainer extends Component {
       windowHeight,
       windowWidth,
       expression: {
-        icon,
+        image,
       },
     } = this.props
     
@@ -260,7 +264,7 @@ class GameStepContainer extends Component {
             width: windowWidth,
             facingMode: 'user',
           }}
-          style={{ position: 'absolute' }}
+          style={{ position: 'absolute', visibility: 'hidden' }}
         />
         <canvas
           ref={this.canvasPicWebCam}
@@ -268,15 +272,38 @@ class GameStepContainer extends Component {
           height={windowHeight}
           style={{ position: 'absolute' }}
         />
-        <Button
-          size='huge'
-          icon={icon}
-          color='orange'
-          circular
-          basic
-          floated='left'
-          style={{ position: 'absolute' }}
+        <ImageComponent
+          size='small'
+          src={image}
+          avatar
+          style={{
+            position: 'absolute',
+            left: '5px',
+            top: '5px',
+          }}
         />
+        <CountTo
+          from={STEP_TIME}
+          to={0}
+          speed={STEP_TIME * 1000}
+          delay={1000}
+          onComplete={this.resetRecognition}
+        >
+          {value => !value ? null : (
+            <Statistic
+              size='huge'
+              style={{
+                position: 'absolute',
+                left: '165px',
+                top: '25px',
+              }}
+            >
+              <Statistic.Value style={{ color: 'white' }}>
+                {value}
+              </Statistic.Value>
+            </Statistic>
+          )}
+        </CountTo>
         <canvas
           style={{ visibility: 'hidden' }}
           ref={this.canvasFace}
