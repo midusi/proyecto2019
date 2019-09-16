@@ -163,8 +163,6 @@ class GameStepContainer extends Component {
   }
 
   drawDescription(canvas, expression) {
-    // faceapi.draw.drawDetections(canvas, this.fullFaceDescriptions.map(({ detection }) => detection))
-    // faceapi.draw.drawFaceExpressions(canvas, this.fullFaceDescriptions, MIN_PROBABILITY)
     this.fullFaceDescriptions.forEach(
       ({ detection, expressions }) => {
         if(expressions[expression] > MIN_PROBABILITY) {

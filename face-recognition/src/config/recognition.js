@@ -12,31 +12,34 @@ export const INPUT_SIZE = 320
 export const MIN_PROBABILITY = 0.1
 export const SCORE_WIDTH = 350
 export const SCORE_HEIGHT = 350
-export const STEPS = 5
+export const STEPS = 3
 
 export const expressions = [{
   name: 'neutral',
   image: neutral,
   minHigh: 0.96,
-  maxHigh: 1
+  maxHigh: 1,
 }, {
   name: 'happy',
   image: happy,
-  minHigh: 0.96,
-  maxHigh: 1
+  minHigh: 0.95,
+  maxHigh: 1,
 }, {
   name: 'sad',
   image: sad,
-  disabled: true,
+  minHigh: 0.8,
+  maxHigh: 1,
 }, {
   name: 'angry',
   image: angry,
-  minHigh: 0.96,
-  maxHigh: 1
+  minHigh: 0.90,
+  maxHigh: 0.98,
 }, {
   name: 'fearfull',
-  image: fearfull, 
+  image: fearfull,
   disabled: true,
+  minHigh: 0.55,
+  maxHigh: 1,
 }, {
   name: 'disgusted',
   image: '',

@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react'
+import { Redirect } from 'react-router-dom'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
@@ -36,6 +37,10 @@ class GameSummaryPage extends Component {
     } = this.props
 
     const arrayedScores = Array.from(scores || [])
+
+    if (!arrayedScores.length) {
+      return <Redirect to='/game' />
+    }
 
     const settings = {
       dots: true,
