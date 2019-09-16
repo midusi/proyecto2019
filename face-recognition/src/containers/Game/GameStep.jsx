@@ -268,7 +268,7 @@ class GameStepContainer extends Component {
             width: windowWidth,
             facingMode: 'user',
           }}
-          style={{ position: 'absolute', visibility: 'hidden' }}
+          style={{ position: 'absolute' }}
         />
         <canvas
           ref={this.canvasPicWebCam}
