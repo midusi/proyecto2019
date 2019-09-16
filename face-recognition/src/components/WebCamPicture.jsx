@@ -31,6 +31,9 @@ class WebCamPicure extends Component {
 
     const imageSrc = this.webcam.current.getScreenshot()
 
+    console.log(this.webcam.current.getCanvas().width)
+    console.log(this.webcam.current.getCanvas().height)
+
     landmarkPicture(imageSrc)
   }
 

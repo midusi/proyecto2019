@@ -217,9 +217,8 @@ class GameStepContainer extends Component {
     const image = new Image()
 
     image.onload = async () => {
-      
-      ctx.drawImage(image, 0, 0)
-      await this.getFullFaceDescription(this.canvasPicWebCam.current)
+
+      await this.getFullFaceDescription(image)
       
       if (this.fullFaceDescriptions && this.fullFaceDescriptions.length) {
         let frameWinnerDescription = winner(expression)(this.fullFaceDescriptions)
@@ -233,7 +232,8 @@ class GameStepContainer extends Component {
         }
         
         this.extractFaces(image)
-        this.drawDescription(this.canvasPicWebCam.current, expression)  
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        this.drawDescription(this.canvasPicWebCam.current, expression)
       }
 
     }
