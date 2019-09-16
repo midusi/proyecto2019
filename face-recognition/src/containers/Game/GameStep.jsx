@@ -38,6 +38,7 @@ class GameStepContainer extends Component {
 
     this.state = {
       faceExpresions: [],
+      leftTime: STEP_TIME,
     }
 
     this.fullFaceDescriptions = null
@@ -56,9 +57,6 @@ class GameStepContainer extends Component {
 
   async componentDidMount() {
     await GameStepContainer.loadModels()
-    
-    setInterval(() => this.runRecognition(), REFRESH_TIME)
-    
   }
 
   async getFullFaceDescription(canvas) {
@@ -185,7 +183,10 @@ class GameStepContainer extends Component {
   }
 
   resetRecognition() {
-    this.endStep()
+    this.setState(state => ({ leftTime: state.leftTime + 1 }))
+
+    this.fullFaceDescriptions = null
+    this.faceImages = null
   }
 
   endStep() {
@@ -206,7 +207,6 @@ class GameStepContainer extends Component {
       this.canvasFace.current.toDataURL(),
       this.winnerDescription.expressions[expression]
     )
-
   }
 
   landmarkWebCamPicture(picture) {
@@ -241,7 +241,7 @@ class GameStepContainer extends Component {
   }
 
   render() {
-    const { faceExpresions } = this.state
+    const { faceExpresions, leftTime } = this.state
     const {
       windowHeight,
       windowWidth,
@@ -257,6 +257,7 @@ class GameStepContainer extends Component {
         <WebCamPicture
           ref={this.webCamPicture}
           landmarkPicture={this.landmarkWebCamPicture}
+          refreshTime={REFRESH_TIME}
           height={windowHeight}
           width={windowWidth}
           videoConstraints={{
@@ -283,11 +284,11 @@ class GameStepContainer extends Component {
           }}
         />
         <CountTo
-          from={STEP_TIME}
+          from={leftTime}
           to={0}
-          speed={STEP_TIME * 1000}
+          speed={leftTime * 1000}
           delay={1000}
-          onComplete={this.resetRecognition}
+          onComplete={this.endStep}
         >
           {value => !value ? null : (
             <Statistic
