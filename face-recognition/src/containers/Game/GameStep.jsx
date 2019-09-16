@@ -1,8 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Redirect } from 'react-router-dom'
 import * as faceapi from 'face-api.js'
-import { Image as ImageComponent, Statistic } from 'semantic-ui-react'
-import CountTo from 'react-count-to'
+import { Image as ImageComponent } from 'semantic-ui-react'
 
 import WebCamPicture from 'src/components/WebCamPicture'
 import { withWindowDimensions } from 'src/helpers/window-size'
@@ -38,8 +37,6 @@ class GameStepContainer extends Component {
 
     this.state = {
       faceExpresions: [],
-      leftTime: STEP_TIME,
-      patch: true,
     }
 
     this.fullFaceDescriptions = null
@@ -58,6 +55,8 @@ class GameStepContainer extends Component {
 
   async componentDidMount() {
     await GameStepContainer.loadModels()
+
+    setTimeout(() => this.endStep(), STEP_TIME * 1000)
   }
 
   async getFullFaceDescription(canvas) {
@@ -180,10 +179,11 @@ class GameStepContainer extends Component {
   }
 
   resetRecognition() {
-    this.setState(state => ({ patch: !state.patch }))
+    const {
+      handleNextStep,
+    } = this.props
 
-    // this.fullFaceDescriptions = null
-    // this.faceImages = null
+    handleNextStep()
   }
 
   endStep() {
@@ -217,16 +217,21 @@ class GameStepContainer extends Component {
     const image = new Image()
 
     image.onload = async () => {
+      
       ctx.drawImage(image, 0, 0)
       await this.getFullFaceDescription(this.canvasPicWebCam.current)
-
+      
       if (this.fullFaceDescriptions && this.fullFaceDescriptions.length) {
         let frameWinnerDescription = winner(expression)(this.fullFaceDescriptions)
-
+        
         if (!this.winnerDescription || (frameWinnerDescription && frameWinnerDescription.expressions[expression] > this.winnerDescription.expressions[expression])) {
           this.winnerDescription = frameWinnerDescription
         }
-
+        
+        if (!this.canvasPicWebCam.current || !this.canvasFace.current) {
+          return
+        }
+        
         this.extractFaces(image)
         this.drawDescription(this.canvasPicWebCam.current, expression)  
       }
@@ -237,7 +242,7 @@ class GameStepContainer extends Component {
   }
 
   render() {
-    const { faceExpresions, leftTime } = this.state
+    const { faceExpresions } = this.state
     const {
       windowHeight,
       windowWidth,
@@ -279,28 +284,6 @@ class GameStepContainer extends Component {
             top: '5px',
           }}
         />
-        <CountTo
-          from={leftTime}
-          to={0}
-          speed={leftTime * 1000}
-          delay={1000}
-          onComplete={this.endStep}
-        >
-          {value => !value ? null : (
-            <Statistic
-              size='huge'
-              style={{
-                position: 'absolute',
-                left: '165px',
-                top: '25px',
-              }}
-            >
-              <Statistic.Value style={{ color: 'white' }}>
-                {value}
-              </Statistic.Value>
-            </Statistic>
-          )}
-        </CountTo>
         <canvas
           style={{ visibility: 'hidden' }}
           ref={this.canvasFace}

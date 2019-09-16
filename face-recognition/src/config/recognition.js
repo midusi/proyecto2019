@@ -8,7 +8,14 @@ export const MODEL_URL = process.env.NODE_ENV === 'development' ? '/models' : '/
 export const MIN_CONFIDENCE = 0.6
 export const REFRESH_TIME = 10
 export const STEP_TIME = 5
-export const INPUT_SIZE = 320
+
+// size at which image is processed, the smaller the faster,
+// but less precise in detecting smaller faces, must be divisible
+// by 32, common sizes are 128, 160, 224, 320, 416, 512, 608,
+// for face tracking via webcam I would recommend using smaller sizes,
+// e.g. 128, 160, for detecting smaller faces use larger sizes, e.g. 512, 608
+// default: 416
+export const INPUT_SIZE = 224
 export const MIN_PROBABILITY = 0.1
 export const SCORE_WIDTH = 350
 export const SCORE_HEIGHT = 350
