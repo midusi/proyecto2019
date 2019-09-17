@@ -40,6 +40,12 @@ const config = {
         use: ['css-loader', 'less-loader']
       }),
     },
+
+    {
+      test: /\.mp3$/,
+      loader: 'file-loader'
+    },
+
     // this rule handles images
     {
       test: /\.jpe?g$|\.gif$|\.ico$|\.png$|\.svg$/,
