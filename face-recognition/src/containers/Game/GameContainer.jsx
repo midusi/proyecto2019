@@ -6,11 +6,14 @@ import PropTypes from 'prop-types'
 import { Modal, Icon, Image, Header, Button, Rating, Select, Statistic } from 'semantic-ui-react'
 import CountTo from 'react-count-to'
 import Sound from 'react-sound'
+import WebCamPicture from 'src/components/WebCamPicture'
 
+import { withWindowDimensions } from 'src/helpers/window-size'
 import GameRoutes from 'src/routes/game'
 import * as scoreActions from 'src/actions/score-actions'
 import {
   STEPS,
+  REFRESH_TIME,
   STEP_TIME,
   supportedExpressions as expressions,
 } from 'src/config/recognition'
@@ -26,7 +29,11 @@ class GamePage extends Component {
     this.state = {
       expressions: _.shuffle(_.sample(expressions, STEPS)),
       devices: [],
+      active: 'step',
+      landmarkWebCamPicture: () => null
     }
+
+    this.webCamPicture = React.createRef()
 
     this.handleNextStep = this.handleNextStep.bind(this)
     this.handleRecognition = this.handleRecognition.bind(this)
@@ -106,11 +113,13 @@ class GamePage extends Component {
   }
 
   render() {
-    const { devices, expressions } = this.state
+    const { devices, active, landmarkWebCamPicture } = this.state
 
     const {
       t,
       trans,
+      windowHeight,
+      windowWidth,
       actions: {
         setDevice,
       },
@@ -133,8 +142,37 @@ class GamePage extends Component {
           trans={trans}
           handleNextStep={this.handleNextStep}
           handleRecognition={this.handleRecognition}
+          setActive={active => this.setState({ active })}
+          setPictureHandler={handler => this.setState({ landmarkWebCamPicture: handler })}
         />
-        {!_.isEmpty(expressions) && (
+        <WebCamPicture
+          ref={this.webCamPicture}
+          landmarkPicture={landmarkWebCamPicture}
+          refreshTime={REFRESH_TIME}
+          height={windowHeight}
+          width={windowWidth}
+          screenshotFormat="image/jpeg"
+          screenshotQuality={1}
+          videoConstraints={{
+            height: windowHeight,
+            width: windowWidth,
+            deviceId: device ? {
+              exact: device,
+            } : undefined,
+          }}
+          style={active === 'summary' ? {
+            '-webkit-filter': 'blur(8px)',
+            '-moz-filter': 'blur(8px)',
+            '-ms-filter': 'blur(8px)',
+            '-o-filter': 'blur(8px)',
+            filter: 'blur(8px)',
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            zIndex: -1,
+          } : { position: 'absolute', top: 0, left: 0, zIndex: -1, }}
+        />
+        {active === 'step' && (
           <Fragment>
             <CountTo
               from={STEP_TIME}
@@ -236,4 +274,4 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(GamePage)
+export default withWindowDimensions(connect(mapStateToProps, mapDispatchToProps)(GamePage))

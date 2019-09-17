@@ -4,12 +4,10 @@ import { Redirect } from 'react-router-dom'
 import * as faceapi from 'face-api.js'
 import { Image as ImageComponent } from 'semantic-ui-react'
 
-import WebCamPicture from 'src/components/WebCamPicture'
 import { withWindowDimensions } from 'src/helpers/window-size'
 import {
   MODEL_URL,
   MIN_CONFIDENCE,
-  REFRESH_TIME,
   STEP_TIME,
   INPUT_SIZE,
   MIN_PROBABILITY,
@@ -43,7 +41,6 @@ class GameStepContainer extends Component {
     this.fullFaceDescriptions = null
     this.winnerDescription = null
 
-    this.webCamPicture = React.createRef()
     this.canvasPicWebCam = React.createRef()
     this.canvasFace = React.createRef()
 
@@ -55,7 +52,12 @@ class GameStepContainer extends Component {
   }
 
   async componentDidMount() {
+    const { setPictureHandler, setActive } = this.props
+
     await GameStepContainer.loadModels()
+
+    setActive('step')
+    setPictureHandler(this.landmarkWebCamPicture)
 
     setTimeout(() => this.endStep(), STEP_TIME * 1000)
   }
@@ -212,6 +214,10 @@ class GameStepContainer extends Component {
         name: expression,
       },
     } = this.props
+
+    if (!this.canvasPicWebCam.current) {
+      return
+    }
     
     const ctx = this.canvasPicWebCam.current.getContext('2d')
 
@@ -246,9 +252,6 @@ class GameStepContainer extends Component {
     const {
       windowHeight,
       windowWidth,
-      score: {
-        device,
-      },
       expression: {
         image,
       },
@@ -258,23 +261,6 @@ class GameStepContainer extends Component {
 
     return (
       <Fragment>
-        <WebCamPicture
-          ref={this.webCamPicture}
-          landmarkPicture={this.landmarkWebCamPicture}
-          refreshTime={REFRESH_TIME}
-          height={windowHeight}
-          width={windowWidth}
-          screenshotFormat="image/jpeg"
-          screenshotQuality={1}
-          videoConstraints={{
-            height: windowHeight,
-            width: windowWidth,
-            deviceId: device ? {
-              exact: device,
-            } : undefined,
-          }}
-          style={{ position: 'absolute' }}
-        />
         <canvas
           ref={this.canvasPicWebCam}
           width={windowWidth}
@@ -289,6 +275,7 @@ class GameStepContainer extends Component {
             position: 'absolute',
             left: '5px',
             top: '5px',
+            zIndex: 2000,
           }}
         />
         <canvas
