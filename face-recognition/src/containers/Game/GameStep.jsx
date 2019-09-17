@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react'
+import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import * as faceapi from 'face-api.js'
 import { Image as ImageComponent } from 'semantic-ui-react'
@@ -183,7 +184,7 @@ class GameStepContainer extends Component {
       handleNextStep,
     } = this.props
 
-    handleNextStep()
+    handleNextStep(false)
   }
 
   endStep() {
@@ -217,9 +218,7 @@ class GameStepContainer extends Component {
     const image = new Image()
 
     image.onload = async () => {
-      
-      ctx.drawImage(image, 0, 0)
-      await this.getFullFaceDescription(this.canvasPicWebCam.current)
+      await this.getFullFaceDescription(image)
       
       if (this.fullFaceDescriptions && this.fullFaceDescriptions.length) {
         let frameWinnerDescription = winner(expression)(this.fullFaceDescriptions)
@@ -233,7 +232,8 @@ class GameStepContainer extends Component {
         }
         
         this.extractFaces(image)
-        this.drawDescription(this.canvasPicWebCam.current, expression)  
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        this.drawDescription(this.canvasPicWebCam.current, expression)
       }
 
     }
@@ -246,6 +246,9 @@ class GameStepContainer extends Component {
     const {
       windowHeight,
       windowWidth,
+      score: {
+        device,
+      },
       expression: {
         image,
       },
@@ -266,7 +269,9 @@ class GameStepContainer extends Component {
           videoConstraints={{
             height: windowHeight,
             width: windowWidth,
-            facingMode: 'user',
+            deviceId: device ? {
+              exact: device,
+            } : undefined,
           }}
           style={{ position: 'absolute' }}
         />
@@ -298,7 +303,7 @@ class GameStepContainer extends Component {
   }
 }
 
-export default withWindowDimensions(props => {
+export default connect(state => ({ score: state.score }))(withWindowDimensions(props => {
   const {
     match: {
       params: {
@@ -314,4 +319,4 @@ export default withWindowDimensions(props => {
   }
 
   return <GameStepContainer {...props} expression={found} />
-})
+}))

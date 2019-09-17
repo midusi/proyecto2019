@@ -3,7 +3,7 @@ import React, { Component, Fragment } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Modal, Icon, Image, Header, Button, Rating } from 'semantic-ui-react'
+import { Modal, Icon, Image, Header, Button, Rating, Select } from 'semantic-ui-react'
 
 import GameRoutes from 'src/routes/game'
 import * as scoreActions from 'src/actions/score-actions'
@@ -11,6 +11,7 @@ import {
   STEPS,
   supportedExpressions as expressions,
 } from 'src/config/recognition'
+import settings from 'src-static/images/settings.png'
 
 class GamePage extends Component {
   constructor(props) {
@@ -18,6 +19,7 @@ class GamePage extends Component {
 
     this.state = {
       expressions: _.shuffle(_.sample(expressions, STEPS)),
+      devices: [],
     }
 
     this.handleNextStep = this.handleNextStep.bind(this)
@@ -29,14 +31,30 @@ class GamePage extends Component {
       actions: {
         onScoreFormClear,
         clearScores,
+        setDevice,
       }
     } = this.props
 
     onScoreFormClear()
     clearScores()
+
+    navigator.mediaDevices.enumerateDevices()
+      .then(devices => this.setState(() => {
+        const mappedDevices = devices.filter(device => device.kind === 'videoinput').map(device => ({
+          key: device.deviceId,
+          value: device.deviceId,
+          text: device.label,
+        }))
+
+        setDevice(mappedDevices[mappedDevices.length - 1].value)
+
+        return {
+          devices: mappedDevices,
+        } 
+      }))
   }
 
-  handleNextStep() {
+  handleNextStep(next = true) {
     const { expressions } = this.state
     const {
       history,
@@ -52,7 +70,7 @@ class GamePage extends Component {
 
     const [current, ...rest] = expressions
 
-    this.setState({
+    if (next) this.setState({
       expressions: rest,
     })
 
@@ -80,10 +98,16 @@ class GamePage extends Component {
   }
 
   render() {
+    const { devices } = this.state
+
     const {
       t,
       trans,
+      actions: {
+        setDevice,
+      },
       score: {
+        device,
         form: {
           fields: {
             image,
@@ -94,8 +118,6 @@ class GamePage extends Component {
       },
     } = this.props
 
-    console.log(this.state)
-
     return (
       <Fragment>
         <GameRoutes
@@ -104,6 +126,34 @@ class GamePage extends Component {
           handleNextStep={this.handleNextStep}
           handleRecognition={this.handleRecognition}
         />
+        <Modal
+          dimmer='blurring'
+          trigger={(
+            <Image
+              size='tiny'
+              src={settings}
+              avatar
+              floated='right'
+              style={{
+                position: 'absolute',
+                right: '5px',
+                top: '5px',
+              }}
+            />
+          )}
+        >
+          <Modal.Content>
+            <Select
+              fluid
+              value={device}
+              loadind={!devices}
+              options={devices}
+              onChange={(e, {value}) => {
+                setDevice(value)
+              }}
+            />
+          </Modal.Content>
+        </Modal>
         <Modal dimmer='blurring' open={!!image}>
           <Modal.Header>{trans('recognize:winner')}</Modal.Header>
           <Modal.Content image>

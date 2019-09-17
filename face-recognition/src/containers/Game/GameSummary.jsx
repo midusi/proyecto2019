@@ -30,6 +30,7 @@ class GameSummaryPage extends Component {
       windowHeight,
       windowWidth,
       score: {
+        device,
         collections: {
           scores,
         }
@@ -96,7 +97,9 @@ class GameSummaryPage extends Component {
           videoConstraints={{
             height: windowHeight,
             width: windowWidth,
-            facingMode: 'user',
+            deviceId: device ? {
+              exact: device,
+            } : undefined,
           }}
         />
         <Container

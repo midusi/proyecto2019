@@ -12,3 +12,5 @@ export const SCORES_CLEAR_FAILURE = 'scores-get-failure'
 export const SCORE_ADD_REQUEST = 'score-add-request'
 export const SCORE_ADD_SUCCESS = 'score-add-success'
 export const SCORE_ADD_FAILURE = 'score-add-failure'
+
+export const SCORE_SET_DEVICE = 'score-set-device'

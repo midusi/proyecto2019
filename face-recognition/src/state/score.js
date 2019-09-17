@@ -1,4 +1,5 @@
 export default {
+  device: null,
   collections: {
     isFetching: false,
     error: null,
