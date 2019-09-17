@@ -1,4 +1,6 @@
 import {
+  SCORE_SET_DEVICE,
+
   SCORES_GET_REQUEST,
   SCORES_GET_SUCCESS,
   SCORES_GET_FAILURE,
@@ -24,6 +26,11 @@ export const onScoreFormClear = () => ({
 export const onScoreFormFieldChange = (field, value) => ({
   type: ON_SCORE_FORM_FIELD_CHANGE,
   payload: { field, value },
+})
+
+export const setDevice = (device) => ({
+  type: SCORE_SET_DEVICE,
+  payload: device,
 })
 
 export const getScores = () => dispatch => {
@@ -75,6 +82,7 @@ export const addScore = () => (dispatch, getState) => {
 export default {
   onScoreFormClear,
   onScoreFormFieldChange,
+  setDevice,
   getScores,
   clearScores,
   addScore,

@@ -1,5 +1,7 @@
 import initialState from 'src/state/score'
 import {
+  SCORE_SET_DEVICE,
+
   SCORES_GET_REQUEST,
   SCORES_GET_SUCCESS,
   SCORES_GET_FAILURE,
@@ -61,6 +63,13 @@ const mutations = {
           [field]: value,
         }
       }
+    }
+  },
+
+  [SCORE_SET_DEVICE](state, device) {
+    return {
+      ...state,
+      device,
     }
   },
 
