@@ -6,19 +6,22 @@ import PropTypes from 'prop-types'
 import { Button, Container, Card, Divider, Rating, Responsive } from 'semantic-ui-react'
 import Slider from 'react-slick'
 
-import WebCamPicture from 'src/components/WebCamPicture'
 import { withWindowDimensions } from 'src/helpers/window-size'
 import * as scoreActions from 'src/actions/score-actions'
 
 class GameSummaryPage extends Component {
   componentDidMount() {
     const {
+      setPictureHandler,
+      setActive,
       actions: {
         onScoreFormClear,
         getScores,
       }
     } = this.props
 
+    setActive('summary')
+    setPictureHandler(() => null)
     onScoreFormClear()
     getScores()
   }
@@ -27,10 +30,7 @@ class GameSummaryPage extends Component {
     const {
       trans,
       history,
-      windowHeight,
-      windowWidth,
       score: {
-        device,
         collections: {
           scores,
         }
@@ -84,24 +84,6 @@ class GameSummaryPage extends Component {
 
     return (
       <Fragment>
-        <WebCamPicture
-          style={{
-            '-webkit-filter': 'blur(8px)',
-            '-moz-filter': 'blur(8px)',
-            '-ms-filter': 'blur(8px)',
-            '-o-filter': 'blur(8px)',
-            filter: 'blur(8px)',
-          }}
-          height={windowHeight}
-          width={windowWidth}
-          videoConstraints={{
-            height: windowHeight,
-            width: windowWidth,
-            deviceId: device ? {
-              exact: device,
-            } : undefined,
-          }}
-        />
         <Container
           style={{
             paddingTop: '75px',
