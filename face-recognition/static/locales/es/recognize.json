@@ -7,5 +7,10 @@
     "home": "Volver a empezar",
     "options": {
         "next": "Siguiente"
+    },
+    "expression": {
+        "happy": "Feliz",
+        "angry": "Enojado",
+        "neutral": "Neutral"
     }
 }

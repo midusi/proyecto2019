@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import * as faceapi from 'face-api.js'
@@ -7,7 +7,6 @@ import { Image as ImageComponent } from 'semantic-ui-react'
 import { withWindowDimensions } from 'src/helpers/window-size'
 import {
   MIN_CONFIDENCE,
-  STEP_TIME,
   INPUT_SIZE,
   MIN_PROBABILITY,
   SCORE_WIDTH,
@@ -23,13 +22,9 @@ import {
   generateBoxWithXCentroid
 } from 'src/helpers/math'
 
-class GameStepContainer extends Component {
+class GameStepContainer extends PureComponent {
   constructor(props) {
     super(props)
-
-    this.state = {
-      faceExpresions: [],
-    }
 
     this.fullFaceDescriptions = null
     this.winnerDescription = null
@@ -49,8 +44,6 @@ class GameStepContainer extends Component {
 
     setActive('step')
     setPictureHandler(this.landmarkWebCamPicture)
-
-    setTimeout(() => this.endStep(), STEP_TIME * 1000)
   }
 
   async getFullFaceDescription(canvas) {
@@ -60,6 +53,7 @@ class GameStepContainer extends Component {
     })
 
     const {
+      initTimeout,
       expression: {
         name: expression,
       }
@@ -67,21 +61,23 @@ class GameStepContainer extends Component {
 
     const winnerForExpression = winner(expression)
 
+    const firstDetection = this.fullFaceDescriptions === null
+
     this.fullFaceDescriptions = await faceapi
       .detectAllFaces(canvas, options)
       .withFaceLandmarks()
       .withFaceExpressions()
 
+    if (firstDetection && this.fullFaceDescriptions) {
+      initTimeout(this.endStep)
+    }
+
     if (this.fullFaceDescriptions && winnerForExpression(this.fullFaceDescriptions)) {
-      const { landmarks, expressions } = winnerForExpression(this.fullFaceDescriptions)
+      const { landmarks } = winnerForExpression(this.fullFaceDescriptions)
 
       this.rightEyeCentroid = centroid(landmarks.getRightEye())
       this.leftEyeCentroid = centroid(landmarks.getLeftEye())
       this.faceAngle = Math.atan(slope(this.leftEyeCentroid, this.rightEyeCentroid))
-
-      this.setState(() => ({
-        faceExpresions: Object.entries(expressions)
-      }))
     }
   }
 
@@ -139,7 +135,7 @@ class GameStepContainer extends Component {
     } = this.props
 
     const ctx = canvas.getContext('2d')
-    const lineWidth = 5
+    const lineWidth = 6
     const initialColor = 0x0040
     const finalColor = 0x00FF
 
@@ -239,7 +235,6 @@ class GameStepContainer extends Component {
   }
 
   render() {
-    const { faceExpresions } = this.state
     const {
       windowHeight,
       windowWidth,
@@ -248,8 +243,6 @@ class GameStepContainer extends Component {
       },
     } = this.props
     
-    void faceExpresions
-
     return (
       <Fragment>
         <canvas
@@ -259,7 +252,7 @@ class GameStepContainer extends Component {
           style={{ position: 'absolute', transform: 'scaleX(-1)' }}
         />
         <ImageComponent
-          size='small'
+          size='medium'
           src={image}
           avatar
           style={{

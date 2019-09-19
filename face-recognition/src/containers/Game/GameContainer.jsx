@@ -3,7 +3,7 @@ import React, { Component, Fragment } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Modal, Icon, Image, Header, Button, Rating, Select, Statistic } from 'semantic-ui-react'
+import { Modal, Icon, Image, Header, Button, Rating, Select } from 'semantic-ui-react'
 import CountTo from 'react-count-to'
 import Sound from 'react-sound'
 
@@ -30,10 +30,12 @@ class GameContainer extends Component {
       expressions: _.shuffle(_.sample(expressions, STEPS)),
       devices: [],
       active: 'step',
-      landmarkWebCamPicture: () => null
+      leftTime: 0,
+      landmarkWebCamPicture: () => null,
     }
 
     this.webCamPicture = React.createRef()
+    this.endStep = () => null
 
     this.handleNextStep = this.handleNextStep.bind(this)
     this.handleNextRound = this.handleNextRound.bind(this)
@@ -87,6 +89,7 @@ class GameContainer extends Component {
     const [r] = _.shuffle(_.sample(expressions, STEPS))
 
     this.setState({
+      leftTime: 0,
       expressions: next ? rest : [...rest, r],
     })
 
@@ -121,14 +124,14 @@ class GameContainer extends Component {
     this.setState({
       expressions: _.shuffle(_.sample(expressions, STEPS)),
       active: 'step',
-      landmarkWebCamPicture: () => null
+      landmarkWebCamPicture: () => null,
     })
 
     this.handleNextStep()
   }
 
   render() {
-    const { devices, active, landmarkWebCamPicture } = this.state
+    const { devices, active, landmarkWebCamPicture, leftTime } = this.state
 
     const {
       t,
@@ -158,6 +161,11 @@ class GameContainer extends Component {
           handleNextStep={this.handleNextStep}
           handleNextRound={this.handleNextRound}
           handleRecognition={this.handleRecognition}
+          initTimeout={(endStep) => {
+            this.setState({ leftTime: STEP_TIME })
+
+            this.endStep = endStep
+          }}
           setActive={active => this.setState({ active })}
           setPictureHandler={handler => this.setState({ landmarkWebCamPicture: handler })}
         />
@@ -188,30 +196,33 @@ class GameContainer extends Component {
             zIndex: -1,
           } : { position: 'absolute', top: 0, left: 0, zIndex: -1, }}
         />
-        {active === 'step' && (
+        {active === 'step' && leftTime && (
           <Fragment>
             <CountTo
-              from={STEP_TIME}
-              to={0}
-              speed={STEP_TIME * 1000}
+              from={leftTime}
+              to={1}
+              speed={leftTime * 1000}
               delay={1000}
+              onComplete={() => this.endStep()}
             >
-              {value => !value ? null : (
-                <Statistic
+              {value => (
+                <center
                   size='huge'
                   style={{
                     position: 'absolute',
-                    left: '165px',
-                    top: '25px',
+                    width: '100%',
+                    height: '100%',
+                    top: '50%',
+                    color: 'white',
+                    fontSize: '40rem',
+                    opacity: 0.6,
                   }}
                 >
-                  <Statistic.Value style={{ color: 'white' }}>
-                    {value}
-                  </Statistic.Value>
-                </Statistic>
+                  {value}
+                </center>
               )}
             </CountTo>
-            {!image && <Sound url={countdown} volume={50} loop playStatus={Sound.status.PLAYING} />}
+            {!image && leftTime && <Sound url={countdown} volume={50} playStatus={Sound.status.PLAYING} />}
           </Fragment>
         )}
         <Modal
@@ -248,7 +259,7 @@ class GameContainer extends Component {
             <Sound url={levelSuccess} playFromPosition={250} playStatus={Sound.status.PLAYING} />
             <Image wrapped size='medium' src={image} style={{ transform: 'scaleX(-1)' }} />
             <Modal.Description>
-              <Header>{expression}</Header>
+              <Header>{trans(`recognize:expression.${expression}`)}</Header>
               <Rating
                 icon='star'
                 size='massive'

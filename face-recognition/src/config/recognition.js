@@ -24,12 +24,12 @@ export const STEPS = 3
 export const expressions = [{
   name: 'neutral',
   image: neutral,
-  minHigh: 0.96,
+  minHigh: 0.90,
   maxHigh: 1,
 }, {
   name: 'happy',
   image: happy,
-  minHigh: 0.95,
+  minHigh: 0.90,
   maxHigh: 1,
 }, {
   name: 'sad',
@@ -40,8 +40,8 @@ export const expressions = [{
 }, {
   name: 'angry',
   image: angry,
-  minHigh: 0.90,
-  maxHigh: 0.98,
+  minHigh: 0.70,
+  maxHigh: 1,
 }, {
   name: 'fearfull',
   image: fearfull,
