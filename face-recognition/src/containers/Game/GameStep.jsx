@@ -2,7 +2,7 @@ import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import * as faceapi from 'face-api.js'
-import { Image as ImageComponent } from 'semantic-ui-react'
+import { Image as ImageComponent, Transition } from 'semantic-ui-react'
 
 import { withWindowDimensions } from 'src/helpers/window-size'
 import {
@@ -26,6 +26,10 @@ class GameStepContainer extends PureComponent {
   constructor(props) {
     super(props)
 
+    this.state = {
+      visible: false,
+    }
+
     this.fullFaceDescriptions = null
     this.winnerDescription = null
 
@@ -44,6 +48,8 @@ class GameStepContainer extends PureComponent {
 
     setActive('step')
     setPictureHandler(this.landmarkWebCamPicture)
+
+    this.setState({ visible: true })
   }
 
   async getFullFaceDescription(canvas) {
@@ -235,6 +241,8 @@ class GameStepContainer extends PureComponent {
   }
 
   render() {
+    const { visible } = this.state
+
     const {
       windowHeight,
       windowWidth,
@@ -251,17 +259,19 @@ class GameStepContainer extends PureComponent {
           height={windowHeight}
           style={{ position: 'absolute', transform: 'scaleX(-1)' }}
         />
-        <ImageComponent
-          size='medium'
-          src={image}
-          avatar
-          style={{
-            position: 'absolute',
-            left: '5px',
-            top: '5px',
-            zIndex: 2000,
-          }}
-        />
+        <Transition animation='zoom' visible={visible} duration={500}>
+          <ImageComponent
+            size='medium'
+            src={image}
+            avatar
+            style={{
+              position: 'absolute',
+              left: '5px',
+              top: '5px',
+              zIndex: 2000,
+            }}
+          />
+        </Transition>
         <canvas
           style={{ visibility: 'hidden' }}
           ref={this.canvasFace}

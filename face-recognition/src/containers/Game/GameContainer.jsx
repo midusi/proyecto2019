@@ -196,7 +196,7 @@ class GameContainer extends Component {
             zIndex: -1,
           } : { position: 'absolute', top: 0, left: 0, zIndex: -1, }}
         />
-        {active === 'step' && leftTime && (
+        {active === 'step' && !!leftTime && (
           <Fragment>
             <CountTo
               from={leftTime}
