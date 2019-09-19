@@ -5,9 +5,11 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Button, Container, Card, Divider, Rating, Responsive } from 'semantic-ui-react'
 import Slider from 'react-slick'
+import Sound from 'react-sound'
 
 import { withWindowDimensions } from 'src/helpers/window-size'
 import * as scoreActions from 'src/actions/score-actions'
+import yee from 'src-static/sound/yee.mp3'
 
 class GameSummaryPage extends Component {
   componentDidMount() {
@@ -28,6 +30,7 @@ class GameSummaryPage extends Component {
 
   render() {
     const {
+      handleNextRound,
       trans,
       history,
       score: {
@@ -51,11 +54,11 @@ class GameSummaryPage extends Component {
       speed: 5000,
       autoplaySpeed: 500,
       cssEase: 'linear',
-      slidesToShow: arrayedScores.length < 4 ? arrayedScores.length : 5,
+      slidesToShow: arrayedScores.length < 4 ? arrayedScores.length : 3,
       slidesToScroll: 1,
     }
 
-    const scoresList = arrayedScores.map((score, i) => (
+    const scoresList = arrayedScores.reverse().map((score, i) => (
       <div
         key={`score-${i+1}`}
         style={{
@@ -84,6 +87,7 @@ class GameSummaryPage extends Component {
 
     return (
       <Fragment>
+        <Sound url={yee} playStatus={Sound.status.PLAYING} onFinishedPlaying={() => handleNextRound()} />
         <Container
           style={{
             paddingTop: '75px',

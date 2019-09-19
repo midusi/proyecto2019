@@ -37,6 +37,7 @@ class WebCamPicure extends Component {
   render() {
     const {
       videoConstraints,
+      style,
       ...rest
     } = this.props
 
@@ -45,6 +46,10 @@ class WebCamPicure extends Component {
         audio={false}
         ref={this.webcam}
         screenshotFormat="image/jpeg"
+        style={{
+          ...(style || {}),
+          transform: 'scaleX(-1)'
+        }}
         {...rest}
         videoConstraints={videoConstraints}
       />

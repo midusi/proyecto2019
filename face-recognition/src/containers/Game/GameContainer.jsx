@@ -6,8 +6,8 @@ import PropTypes from 'prop-types'
 import { Modal, Icon, Image, Header, Button, Rating, Select, Statistic } from 'semantic-ui-react'
 import CountTo from 'react-count-to'
 import Sound from 'react-sound'
-import WebCamPicture from 'src/components/WebCamPicture'
 
+import WebCamPicture from 'src/components/WebCamPicture'
 import { withWindowDimensions } from 'src/helpers/window-size'
 import GameRoutes from 'src/routes/game'
 import * as scoreActions from 'src/actions/score-actions'
@@ -22,7 +22,7 @@ import settings from 'src-static/images/settings.png'
 import countdown from 'src-static/sound/countdown.mp3'
 import levelSuccess from 'src-static/sound/level-success.mp3'
 
-class GamePage extends Component {
+class GameContainer extends Component {
   constructor(props) {
     super(props)
 
@@ -36,6 +36,7 @@ class GamePage extends Component {
     this.webCamPicture = React.createRef()
 
     this.handleNextStep = this.handleNextStep.bind(this)
+    this.handleNextRound = this.handleNextRound.bind(this)
     this.handleRecognition = this.handleRecognition.bind(this)
   }
 
@@ -50,7 +51,7 @@ class GamePage extends Component {
 
     onScoreFormClear()
     clearScores()
-
+    
     navigator.mediaDevices.enumerateDevices()
       .then(devices => this.setState(() => {
         const mappedDevices = devices.filter(device => device.kind === 'videoinput').map(device => ({
@@ -58,9 +59,9 @@ class GamePage extends Component {
           value: device.deviceId,
           text: device.label,
         }))
-
+        
         !_.isEmpty(mappedDevices) && setDevice(mappedDevices[0].value)
-
+        
         return {
           devices: mappedDevices,
         } 
@@ -83,8 +84,10 @@ class GamePage extends Component {
 
     const [current, ...rest] = expressions
 
+    const [r] = _.shuffle(_.sample(expressions, STEPS))
+
     this.setState({
-      expressions: next ? rest : [...rest, current],
+      expressions: next ? rest : [...rest, r],
     })
 
     onScoreFormClear()
@@ -93,7 +96,7 @@ class GamePage extends Component {
     setTimeout(() => {
       next ?
         history.push(`/game/step/${current.name}`) :
-        history.push(`/game/step/${[...rest, current][0].name}`)
+        history.push(`/game/step/${[...rest, r][0].name}`)
     })
   }
 
@@ -110,6 +113,18 @@ class GamePage extends Component {
     onScoreFormFieldChange('image', image)
 
     addScore()
+
+    setTimeout(() => this.handleNextStep(), 5000)
+  }
+
+  handleNextRound() {
+    this.setState({
+      expressions: _.shuffle(_.sample(expressions, STEPS)),
+      active: 'step',
+      landmarkWebCamPicture: () => null
+    })
+
+    this.handleNextStep()
   }
 
   render() {
@@ -141,6 +156,7 @@ class GamePage extends Component {
           t={t}
           trans={trans}
           handleNextStep={this.handleNextStep}
+          handleNextRound={this.handleNextRound}
           handleRecognition={this.handleRecognition}
           setActive={active => this.setState({ active })}
           setPictureHandler={handler => this.setState({ landmarkWebCamPicture: handler })}
@@ -195,7 +211,7 @@ class GamePage extends Component {
                 </Statistic>
               )}
             </CountTo>
-            {!image && <Sound url={countdown} loop playStatus={Sound.status.PLAYING} />}
+            {!image && <Sound url={countdown} volume={50} loop playStatus={Sound.status.PLAYING} />}
           </Fragment>
         )}
         <Modal
@@ -230,7 +246,7 @@ class GamePage extends Component {
           <Modal.Header>{trans('recognize:winner')}</Modal.Header>
           <Modal.Content image>
             <Sound url={levelSuccess} playFromPosition={250} playStatus={Sound.status.PLAYING} />
-            <Image wrapped size='medium' src={image} />
+            <Image wrapped size='medium' src={image} style={{ transform: 'scaleX(-1)' }} />
             <Modal.Description>
               <Header>{expression}</Header>
               <Rating
@@ -253,7 +269,7 @@ class GamePage extends Component {
   }  
 }
 
-GamePage.propTypes = {
+GameContainer.propTypes = {
   t: PropTypes.func.isRequired,
   trans: PropTypes.func.isRequired,
 }
@@ -274,4 +290,4 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export default withWindowDimensions(connect(mapStateToProps, mapDispatchToProps)(GamePage))
+export default withWindowDimensions(connect(mapStateToProps, mapDispatchToProps)(GameContainer))

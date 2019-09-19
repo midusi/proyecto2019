@@ -4,7 +4,7 @@ import happy from 'src-static/images/expressions/happy.png'
 import neutral from 'src-static/images/expressions/neutral.png'
 import sad from 'src-static/images/expressions/sad.png'
 
-export const MODEL_URL = process.env.NODE_ENV === 'development' ? '/models' : '/proyecto2019/models'
+export const MODEL_URL = process.env.NODE_ENV === 'development' ? '/models' : /* '/proyecto2019/models' */ '/models'
 export const MIN_CONFIDENCE = 0.6
 export const REFRESH_TIME = 10
 export const STEP_TIME = 5
@@ -15,7 +15,7 @@ export const STEP_TIME = 5
 // for face tracking via webcam I would recommend using smaller sizes,
 // e.g. 128, 160, for detecting smaller faces use larger sizes, e.g. 512, 608
 // default: 416
-export const INPUT_SIZE = 320
+export const INPUT_SIZE = 608
 export const MIN_PROBABILITY = 0.1
 export const SCORE_WIDTH = 350
 export const SCORE_HEIGHT = 350

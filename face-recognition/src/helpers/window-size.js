@@ -51,11 +51,13 @@ export const withWindowDimensions = WrappedComponent => {
     render() {
       const { width, height } = this.state
 
+      void width, height
+
       return (
         <WrappedComponent
           {...this.props}
-          windowWidth={width}
-          windowHeight={height}
+          windowWidth={1920}
+          windowHeight={1080}
           isMobileSized={width < 700}
         />
       )

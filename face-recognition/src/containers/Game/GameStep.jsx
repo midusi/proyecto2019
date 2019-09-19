@@ -6,7 +6,6 @@ import { Image as ImageComponent } from 'semantic-ui-react'
 
 import { withWindowDimensions } from 'src/helpers/window-size'
 import {
-  MODEL_URL,
   MIN_CONFIDENCE,
   STEP_TIME,
   INPUT_SIZE,
@@ -25,12 +24,6 @@ import {
 } from 'src/helpers/math'
 
 class GameStepContainer extends Component {
-  static async loadModels() {
-    await faceapi.loadTinyFaceDetectorModel(MODEL_URL)
-    await faceapi.loadFaceExpressionModel(MODEL_URL)
-    await faceapi.loadFaceLandmarkModel(MODEL_URL)
-  }
-
   constructor(props) {
     super(props)
 
@@ -51,10 +44,8 @@ class GameStepContainer extends Component {
     this.drawBox = this.drawBox.bind(this)
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { setPictureHandler, setActive } = this.props
-
-    await GameStepContainer.loadModels()
 
     setActive('step')
     setPictureHandler(this.landmarkWebCamPicture)
@@ -148,7 +139,7 @@ class GameStepContainer extends Component {
     } = this.props
 
     const ctx = canvas.getContext('2d')
-    const lineWidth = 3
+    const lineWidth = 5
     const initialColor = 0x0040
     const finalColor = 0x00FF
 
@@ -265,7 +256,7 @@ class GameStepContainer extends Component {
           ref={this.canvasPicWebCam}
           width={windowWidth}
           height={windowHeight}
-          style={{ position: 'absolute' }}
+          style={{ position: 'absolute', transform: 'scaleX(-1)' }}
         />
         <ImageComponent
           size='small'

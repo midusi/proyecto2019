@@ -2,7 +2,11 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import * as faceapi from 'face-api.js'
 
+import {
+  MODEL_URL,
+} from 'src/config/recognition'
 import DevTools from 'src/components/DevTools'
 
 function mapStateToProps(state) {
@@ -16,6 +20,16 @@ function mapDispatchToProps(dispatch) {
 }
 
 class App extends Component {
+  static async loadModels() {
+    await faceapi.loadTinyFaceDetectorModel(MODEL_URL)
+    await faceapi.loadFaceExpressionModel(MODEL_URL)
+    await faceapi.loadFaceLandmarkModel(MODEL_URL)
+  }
+
+  async componentDidMount() {
+    await App.loadModels()
+  }
+
   render() {
     const { children } = this.props
 
