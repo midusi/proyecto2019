@@ -27,7 +27,7 @@ class GameContainer extends Component {
     super(props)
 
     this.state = {
-      expressions: _.shuffle(_.sample(expressions, STEPS)),
+      expressions: _.sample(expressions, STEPS),
       devices: [],
       active: 'step',
       leftTime: 0,
