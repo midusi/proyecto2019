@@ -225,6 +225,19 @@ class GameContainer extends Component {
             {!image && leftTime && <Sound url={countdown} volume={50} playStatus={Sound.status.PLAYING} />}
           </Fragment>
         )}
+        <Header
+          inverted
+          style={{
+            position: 'absolute',
+            top: '25px',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            textTransform: 'uppercase',
+            fontSize: '5.3rem',
+          }}
+        >
+          {trans('home:title')}
+        </Header>
         <Modal
           dimmer='blurring'
           trigger={(
