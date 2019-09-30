@@ -2,7 +2,7 @@ import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import * as faceapi from 'face-api.js'
-import { Image as ImageComponent, Transition } from 'semantic-ui-react'
+import { Image as ImageComponent, Transition, Header } from 'semantic-ui-react'
 
 import { withWindowDimensions } from 'src/helpers/window-size'
 import {
@@ -28,6 +28,7 @@ class GameStepContainer extends PureComponent {
 
     this.state = {
       visible: false,
+      started: false,
     }
 
     this.fullFaceDescriptions = null
@@ -49,7 +50,7 @@ class GameStepContainer extends PureComponent {
     setActive('step')
     setPictureHandler(this.landmarkWebCamPicture)
 
-    this.setState({ visible: true })
+    this.setState({ visible: true, })
   }
 
   async getFullFaceDescription(canvas) {
@@ -75,6 +76,7 @@ class GameStepContainer extends PureComponent {
       .withFaceExpressions()
 
     if (firstDetection && this.fullFaceDescriptions) {
+      this.setState({ started: true })
       initTimeout(this.endStep)
     }
 
@@ -241,16 +243,18 @@ class GameStepContainer extends PureComponent {
   }
 
   render() {
-    const { visible } = this.state
+    const { visible, started } = this.state
 
     const {
       windowHeight,
       windowWidth,
+      trans,
       expression: {
         image,
+        name,
       },
     } = this.props
-    
+
     return (
       <Fragment>
         <canvas
@@ -259,9 +263,46 @@ class GameStepContainer extends PureComponent {
           height={windowHeight}
           style={{ position: 'absolute', transform: 'scaleX(-1)' }}
         />
-        <Transition animation='zoom' visible={visible} duration={500}>
+        <Transition animation='zoom' visible={visible && !started} duration={500}>
+          <center
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              color: 'white',
+              zIndex: 2000,
+            }}
+          >
+            <ImageComponent
+              size='large'
+              src={image}
+              avatar
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                opacity: 0.4,
+              }}
+            />
+            <Header
+              inverted
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                textTransform: 'uppercase',
+                fontSize: '18.53rem',
+              }}
+            >
+              {trans('recognize:expl', { expression: trans(`recognize:expression.${name}`) })}
+            </Header>
+          </center>
+        </Transition>
+        <Transition animation='zoom' visible={visible && started} duration={500}>
           <ImageComponent
-            size='medium'
+            size='tiny'
             src={image}
             avatar
             style={{
