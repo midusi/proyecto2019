@@ -20,6 +20,7 @@ import {
 
 import settings from 'src-static/images/settings.png'
 import countdown from 'src-static/sound/countdown.mp3'
+import camera from 'src-static/sound/camera.mp3'
 import levelSuccess from 'src-static/sound/level-success.mp3'
 
 class GameContainer extends Component {
@@ -31,6 +32,7 @@ class GameContainer extends Component {
       devices: [],
       active: 'step',
       leftTime: 0,
+      playCameraSound: false,
       landmarkWebCamPicture: () => null,
     }
 
@@ -90,6 +92,7 @@ class GameContainer extends Component {
 
     this.setState({
       leftTime: 0,
+      playCameraSound: false,
       expressions: next ? rest : [...rest, r],
     })
 
@@ -131,7 +134,7 @@ class GameContainer extends Component {
   }
 
   render() {
-    const { devices, active, landmarkWebCamPicture, leftTime } = this.state
+    const { devices, active, landmarkWebCamPicture, leftTime, playCameraSound } = this.state
 
     const {
       t,
@@ -203,7 +206,10 @@ class GameContainer extends Component {
               to={1}
               speed={leftTime * 1000}
               delay={1000}
-              onComplete={() => this.endStep()}
+              onComplete={() => {
+                this.endStep()
+                this.setState({ playCameraSound: true })
+              }}
             >
               {value => (
                 <center
@@ -222,9 +228,10 @@ class GameContainer extends Component {
                 </center>
               )}
             </CountTo>
-            {!image && leftTime && <Sound url={countdown} volume={50} playStatus={Sound.status.PLAYING} />}
+            {!image && <Sound url={countdown} volume={50} playStatus={Sound.status.PLAYING} />}
           </Fragment>
         )}
+        {playCameraSound && <Sound url={camera} playStatus={Sound.status.PLAYING} />}
         <Header
           inverted
           style={{
