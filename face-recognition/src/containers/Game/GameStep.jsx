@@ -11,6 +11,7 @@ import {
   MIN_PROBABILITY,
   SCORE_WIDTH,
   SCORE_HEIGHT,
+  MIN_CONSISTENCY,
   supportedExpressions,
 } from 'src/config/recognition'
 
@@ -33,6 +34,8 @@ class GameStepContainer extends PureComponent {
 
     this.fullFaceDescriptions = null
     this.winnerDescription = null
+    this.framesInARow = 0
+    this.winnerImage = null
 
     this.canvasPicWebCam = React.createRef()
     this.canvasFace = React.createRef()
@@ -59,6 +62,13 @@ class GameStepContainer extends PureComponent {
       scoreThreshold: MIN_CONFIDENCE
     })
 
+    this.fullFaceDescriptions = await faceapi
+      .detectAllFaces(canvas, options)
+      .withFaceLandmarks()
+      .withFaceExpressions()
+  }
+
+  gameStarter(winner){
     const {
       initTimeout,
       expression: {
@@ -66,26 +76,15 @@ class GameStepContainer extends PureComponent {
       }
     } = this.props
 
-    const winnerForExpression = winner(expression)
-
-    const firstDetection = this.fullFaceDescriptions === null
-
-    this.fullFaceDescriptions = await faceapi
-      .detectAllFaces(canvas, options)
-      .withFaceLandmarks()
-      .withFaceExpressions()
-
-    if (firstDetection && this.fullFaceDescriptions) {
-      this.setState({ started: true })
-      initTimeout(this.endStep)
+    if (this.fullFaceDescriptions && winner.expressions[expression] > MIN_PROBABILITY){
+      this.framesInARow += 1
+    }else{
+      this.framesInARow = 0
     }
 
-    if (this.fullFaceDescriptions && winnerForExpression(this.fullFaceDescriptions)) {
-      const { landmarks } = winnerForExpression(this.fullFaceDescriptions)
-
-      this.rightEyeCentroid = centroid(landmarks.getRightEye())
-      this.leftEyeCentroid = centroid(landmarks.getLeftEye())
-      this.faceAngle = Math.atan(slope(this.leftEyeCentroid, this.rightEyeCentroid))
+    if (this.framesInARow > MIN_CONSISTENCY) {
+      this.setState({ started: true })
+      initTimeout(this.endStep)
     }
   }
 
@@ -192,9 +191,15 @@ class GameStepContainer extends PureComponent {
       },
     } = this.props
 
-    if (!(this.winnerDescription && this.winnerDescription.expressions[expression] > MIN_PROBABILITY)) {
+    if (!(this.winnerDescription)) {
       return this.resetRecognition()
     }
+
+    const { landmarks } = this.winnerDescription
+    this.rightEyeCentroid = centroid(landmarks.getRightEye())
+    this.leftEyeCentroid = centroid(landmarks.getLeftEye())
+    this.faceAngle = Math.atan(slope(this.leftEyeCentroid, this.rightEyeCentroid))
+    this.extractFaces(this.winnerImage)
 
     handleRecognition(
       expression,
@@ -204,6 +209,8 @@ class GameStepContainer extends PureComponent {
   }
 
   landmarkWebCamPicture(picture) {
+    const { started } = this.state
+
     const {
       expression: {
         name: expression,
@@ -222,17 +229,17 @@ class GameStepContainer extends PureComponent {
       await this.getFullFaceDescription(image)
       
       if (this.fullFaceDescriptions && this.fullFaceDescriptions.length) {
-        let frameWinnerDescription = winner(expression)(this.fullFaceDescriptions)
-        
-        if (!this.winnerDescription || (frameWinnerDescription && frameWinnerDescription.expressions[expression] > this.winnerDescription.expressions[expression])) {
-          this.winnerDescription = frameWinnerDescription
+        this.winnerDescription = winner(expression)(this.fullFaceDescriptions)
+        this.winnerImage = image
+
+        if (!started){
+          this.gameStarter(this.winnerDescription)
         }
         
         if (!this.canvasPicWebCam.current || !this.canvasFace.current) {
           return
         }
         
-        this.extractFaces(image)
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         this.drawDescription(this.canvasPicWebCam.current, expression)
       }

@@ -3,7 +3,7 @@ import React, { Component, Fragment } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Modal, Icon, Image, Header, Button, Rating, Select } from 'semantic-ui-react'
+import { Modal, Image, Header, Rating, Select } from 'semantic-ui-react'
 import CountTo from 'react-count-to'
 import Sound from 'react-sound'
 
@@ -288,12 +288,6 @@ class GameContainer extends Component {
               />
             </Modal.Description>
           </Modal.Content>
-          <Modal.Actions>
-            <Button color='blue' onClick={() => this.handleNextStep()}>
-              {trans('recognize:options.next')}
-              <Icon name='chevron right' />
-            </Button>
-          </Modal.Actions>
         </Modal>
       </Fragment>
     )

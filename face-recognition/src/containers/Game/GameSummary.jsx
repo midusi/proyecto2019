@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Button, Container, Card, Divider, Rating, Responsive } from 'semantic-ui-react'
+import { Container, Card, Divider, Rating, Responsive } from 'semantic-ui-react'
 import Slider from 'react-slick'
 import Sound from 'react-sound'
 
@@ -32,7 +32,6 @@ class GameSummaryPage extends Component {
     const {
       handleNextRound,
       trans,
-      history,
       score: {
         collections: {
           scores,
@@ -124,13 +123,6 @@ class GameSummaryPage extends Component {
             </Slider>
           </Responsive>
           <Divider hidden />
-          <Button
-            floated='right'
-            color='blue'
-            onClick={() => history.push('/')}
-          >
-            {trans('recognize:home')}
-          </Button>
         </Container>
       </Fragment>
     )
