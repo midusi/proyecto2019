@@ -1,3 +1,4 @@
+import _ from 'underscore'
 import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
@@ -33,7 +34,7 @@ class GameStepContainer extends PureComponent {
     }
 
     this.fullFaceDescriptions = null
-    this.winnerDescription = null
+    this.winnersDescription = null
     this.framesInARow = 0
     this.winnerImage = null
 
@@ -68,7 +69,7 @@ class GameStepContainer extends PureComponent {
       .withFaceExpressions()
   }
 
-  gameStarter(winner){
+  gameStarter(winners){
     const {
       initTimeout,
       expression: {
@@ -76,7 +77,7 @@ class GameStepContainer extends PureComponent {
       }
     } = this.props
 
-    if (this.fullFaceDescriptions && winner.expressions[expression] > MIN_PROBABILITY){
+    if (this.fullFaceDescriptions && winners[0].expressions[expression] > MIN_PROBABILITY){
       this.framesInARow += 1
     }else{
       this.framesInARow = 0
@@ -191,21 +192,23 @@ class GameStepContainer extends PureComponent {
       },
     } = this.props
 
-    if (!(this.winnerDescription)) {
+    if (_.isEmpty(this.winnersDescription)) {
       return this.resetRecognition()
     }
 
-    const { landmarks } = this.winnerDescription
-    this.rightEyeCentroid = centroid(landmarks.getRightEye())
-    this.leftEyeCentroid = centroid(landmarks.getLeftEye())
-    this.faceAngle = Math.atan(slope(this.leftEyeCentroid, this.rightEyeCentroid))
-    this.extractFaces(this.winnerImage)
+    _.forEach(this.winnersDescription, winnerDescription => {
+      const { landmarks } = winnerDescription
+      this.rightEyeCentroid = centroid(landmarks.getRightEye())
+      this.leftEyeCentroid = centroid(landmarks.getLeftEye())
+      this.faceAngle = Math.atan(slope(this.leftEyeCentroid, this.rightEyeCentroid))
+      this.extractFaces(this.winnerImage)
 
-    handleRecognition(
-      expression,
-      this.canvasFace.current.toDataURL(),
-      this.winnerDescription.expressions[expression]
-    )
+      handleRecognition(
+        expression,
+        this.canvasFace.current.toDataURL(),
+        winnerDescription.expressions[expression]
+      )
+    })
   }
 
   landmarkWebCamPicture(picture) {
@@ -229,11 +232,11 @@ class GameStepContainer extends PureComponent {
       await this.getFullFaceDescription(image)
       
       if (this.fullFaceDescriptions && this.fullFaceDescriptions.length) {
-        this.winnerDescription = winner(expression)(this.fullFaceDescriptions)
+        this.winnersDescription = winner(expression)(this.fullFaceDescriptions)
         this.winnerImage = image
 
         if (!started){
-          this.gameStarter(this.winnerDescription)
+          this.gameStarter(this.winnersDescription)
         }
         
         if (!this.canvasPicWebCam.current || !this.canvasFace.current) {

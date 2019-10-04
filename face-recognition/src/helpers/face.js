@@ -4,9 +4,9 @@ export const winner = expression => descriptions => {
   if (!descriptions[0])
     return null
 
-  return _.max(descriptions, description => {
+  return _.sample(_.sortBy(descriptions, description => {
     return description.expressions[expression]
-  })
+  }), 3)
 }
 
 export default {
