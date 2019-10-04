@@ -124,6 +124,11 @@ class GameContainer extends Component {
 
   handleNextRound() {
     const { expressions } = this.state
+    const {
+      actions: {
+        clearScores
+      }
+    } = this.props
 
     this.setState({
       expressions: _.isEmpty(expressions) ?
@@ -133,7 +138,8 @@ class GameContainer extends Component {
       landmarkWebCamPicture: () => null,
     })
 
-    setTimeout(() => this.handleNextStep(true, false), 1000)
+    this.handleNextStep(true, false)
+    clearScores()
   }
 
   render() {
