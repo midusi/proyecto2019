@@ -16,7 +16,7 @@ import {
   supportedExpressions,
 } from 'src/config/recognition'
 
-import { winner } from 'src/helpers/face'
+import { winners } from 'src/helpers/face'
 import {
   centroid,
   slope,
@@ -181,7 +181,7 @@ class GameStepContainer extends PureComponent {
       handleNextStep,
     } = this.props
 
-    handleNextStep(false)
+    handleNextStep(false, false)
   }
 
   endStep() {
@@ -232,7 +232,7 @@ class GameStepContainer extends PureComponent {
       await this.getFullFaceDescription(image)
       
       if (this.fullFaceDescriptions && this.fullFaceDescriptions.length) {
-        this.winnersDescription = winner(expression)(this.fullFaceDescriptions)
+        this.winnersDescription = winners(expression)(this.fullFaceDescriptions)
         this.winnerImage = image
 
         if (!started){

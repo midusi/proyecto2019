@@ -3,7 +3,7 @@ import React, { Component, Fragment } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Modal, Image, Header, Rating, Select } from 'semantic-ui-react'
+import { Modal, Image, Header, Select } from 'semantic-ui-react'
 import CountTo from 'react-count-to'
 import Sound from 'react-sound'
 
@@ -21,7 +21,6 @@ import {
 import settings from 'src-static/images/settings.png'
 import countdown from 'src-static/sound/countdown.mp3'
 import camera from 'src-static/sound/camera.mp3'
-import levelSuccess from 'src-static/sound/level-success.mp3'
 
 class GameContainer extends Component {
   constructor(props) {
@@ -72,7 +71,7 @@ class GameContainer extends Component {
       }))
   }
 
-  handleNextStep(next = true) {
+  handleNextStep(next = true, summary = true) {
     const { expressions } = this.state
     const {
       history,
@@ -81,7 +80,7 @@ class GameContainer extends Component {
       }
     } = this.props
 
-    if (_.isEmpty(expressions)) {
+    if (summary) {
       history.push('/game/summary')
       return
     }
@@ -120,17 +119,21 @@ class GameContainer extends Component {
 
     addScore()
 
-    setTimeout(() => this.handleNextStep(), 5000)
+    this.handleNextStep()
   }
 
   handleNextRound() {
+    const { expressions } = this.state
+
     this.setState({
-      expressions: _.shuffle(_.sample(expressions, STEPS)),
+      expressions: _.isEmpty(expressions) ?
+        _.shuffle(_.sample(expressions, STEPS)) :
+        expressions,
       active: 'step',
       landmarkWebCamPicture: () => null,
     })
 
-    this.handleNextStep()
+    setTimeout(() => this.handleNextStep(true, false), 1000)
   }
 
   render() {
@@ -149,8 +152,6 @@ class GameContainer extends Component {
         form: {
           fields: {
             image,
-            expression,
-            probability,
           }
         }
       },
@@ -271,22 +272,6 @@ class GameContainer extends Component {
                 setDevice(value)
               }}
             />
-          </Modal.Content>
-        </Modal>
-        <Modal dimmer='blurring' open={!!image}>
-          <Modal.Header>{trans('recognize:winner')}</Modal.Header>
-          <Modal.Content image>
-            <Sound url={levelSuccess} playFromPosition={250} playStatus={Sound.status.PLAYING} />
-            <Image wrapped size='medium' src={image} style={{ transform: 'scaleX(-1)' }} />
-            <Modal.Description>
-              <Header>{trans(`recognize:expression.${expression}`)}</Header>
-              <Rating
-                icon='star'
-                size='massive'
-                maxRating={5}
-                rating={probability*5}
-              />
-            </Modal.Description>
           </Modal.Content>
         </Modal>
       </Fragment>

@@ -10,7 +10,7 @@ class GameStart extends Component {
   componentDidMount() {
     const { handleNextStep } = this.props
 
-    handleNextStep()
+    handleNextStep(true, false)
   }
 
   render() {

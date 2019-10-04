@@ -1,6 +1,6 @@
 import _ from 'underscore'
 
-export const winner = expression => descriptions => {
+export const winners = expression => descriptions => {
   if (!descriptions[0])
     return null
 
@@ -10,5 +10,5 @@ export const winner = expression => descriptions => {
 }
 
 export default {
-  winner,
+  winners,
 }

@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react'
-import { Redirect } from 'react-router-dom'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
@@ -9,7 +8,7 @@ import Sound from 'react-sound'
 
 import { withWindowDimensions } from 'src/helpers/window-size'
 import * as scoreActions from 'src/actions/score-actions'
-import yee from 'src-static/sound/yee.mp3'
+import levelSuccess from 'src-static/sound/level-success.mp3'
 
 class GameSummaryPage extends Component {
   componentDidMount() {
@@ -40,10 +39,6 @@ class GameSummaryPage extends Component {
     } = this.props
 
     const arrayedScores = Array.from(scores || [])
-
-    if (!arrayedScores.length) {
-      return <Redirect to='/game' />
-    }
 
     const settings = {
       dots: true,
@@ -86,7 +81,7 @@ class GameSummaryPage extends Component {
 
     return (
       <Fragment>
-        <Sound url={yee} playStatus={Sound.status.PLAYING} onFinishedPlaying={() => handleNextRound()} />
+        <Sound url={levelSuccess} playStatus={Sound.status.PLAYING} onFinishedPlaying={() => handleNextRound()} />
         <Container
           style={{
             paddingTop: '75px',
