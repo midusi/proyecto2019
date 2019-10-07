@@ -35,7 +35,7 @@ class GameStepContainer extends PureComponent {
 
     this.fullFaceDescriptions = null
     this.winnersDescription = null
-    this.framesInARow = 0
+    this.framesTimeout = null
     this.winnerImage = null
 
     this.canvasPicWebCam = React.createRef()
@@ -77,13 +77,16 @@ class GameStepContainer extends PureComponent {
       }
     } = this.props
 
-    if (this.fullFaceDescriptions && winners[0].expressions[expression] > MIN_PROBABILITY){
-      this.framesInARow += 1
-    }else{
-      this.framesInARow = 0
+    if( this.fullFaceDescriptions && winners[0].expressions[expression] > MIN_PROBABILITY){
+      if (this.framesTimeout == null){
+        this.framesTimeout = Date.now()
+      }
+    } else{
+      this.framesTimeout = null
     }
 
-    if (this.framesInARow > MIN_CONSISTENCY) {
+    if (this.framesTimeout != null && this.framesTimeout != 0 && Date.now() - this.framesTimeout > MIN_CONSISTENCY) {
+      this.framesTimeout = null
       this.setState({ started: true })
       initTimeout(this.endStep)
     }
@@ -191,6 +194,8 @@ class GameStepContainer extends PureComponent {
         name: expression,
       },
     } = this.props
+
+    this.setState({ started: false })
 
     if (_.isEmpty(this.winnersDescription)) {
       return this.resetRecognition()

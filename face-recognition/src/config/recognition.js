@@ -7,7 +7,7 @@ import sad from 'src-static/images/expressions/sad.png'
 export const MODEL_URL = process.env.NODE_ENV === 'development' ? '/models' : /* '/proyecto2019/models' */ '/models'
 export const MIN_CONFIDENCE = 0.6
 export const REFRESH_TIME = 10
-export const STEP_TIME = 5
+export const STEP_TIME = 3
 
 // size at which image is processed, the smaller the faster,
 // but less precise in detecting smaller faces, must be divisible
@@ -20,7 +20,7 @@ export const MIN_PROBABILITY = 0.1
 export const SCORE_WIDTH = 350
 export const SCORE_HEIGHT = 350
 export const STEPS = 3
-export const MIN_CONSISTENCY = 10
+export const MIN_CONSISTENCY = 1000
 
 export const expressions = [{
   name: 'neutral',
