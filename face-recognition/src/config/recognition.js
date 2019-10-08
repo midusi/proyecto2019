@@ -20,7 +20,7 @@ export const MIN_PROBABILITY = 0.1
 export const SCORE_WIDTH = 350
 export const SCORE_HEIGHT = 350
 export const STEPS = 3
-export const MIN_CONSISTENCY = 5
+export const MIN_CONSISTENCY = 500
 
 export const expressions = [{
   name: 'neutral',
