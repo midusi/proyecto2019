@@ -292,18 +292,18 @@ class GameStepContainer extends PureComponent {
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                opacity: 0.4,
+                // opacity: 0.4,
               }}
             />
             <Header
               inverted
               style={{
                 position: 'absolute',
-                top: '50%',
+                bottom: '25px',
                 left: '50%',
-                transform: 'translate(-50%, -50%)',
+                transform: 'translate(-50%, 20%)',
                 textTransform: 'uppercase',
-                fontSize: '18.53rem',
+                fontSize: '12.53rem',
               }}
             >
               {trans('recognize:expl', { expression: trans(`recognize:expression.${name}`) })}

@@ -264,6 +264,7 @@ class GameContainer extends Component {
                 position: 'absolute',
                 right: '5px',
                 top: '5px',
+                zIndex: 2001,
               }}
             />
           )}
