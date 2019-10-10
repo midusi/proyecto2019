@@ -160,7 +160,7 @@ class GameStepContainer extends PureComponent {
 
     ctx.strokeStyle = color
     ctx.lineWidth = lineWidth
-    ctx.strokeRect(box.x, box.y, box.width, box.height)
+    ctx.strokeRect(box.x, box.y - 75, box.width, box.height + 75)
   }
 
   drawDescription(canvas, expression) {
