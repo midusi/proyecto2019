@@ -150,12 +150,12 @@ class GameStepContainer extends PureComponent {
     const initialColor = 0x0040
     const finalColor = 0x00FF
 
-    let color = '#00' + initialColor.toString(16) + initialColor.toString(16)
+    let color = `#${0x0090.toString(16)}0000`
     if (confidence > minHigh) {
       let ratio = (confidence - minHigh)/(maxHigh - minHigh)
       if (ratio > 1) ratio = 1
       let intensity = Math.floor(initialColor + (finalColor - initialColor)*ratio)
-      color = '#00' + intensity.toString(16) + initialColor.toString(16)
+      color = `#00${intensity.toString(16)}${initialColor.toString(16)}`
     }
 
     ctx.strokeStyle = color
