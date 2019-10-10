@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Container, Card, Divider, Rating, Responsive } from 'semantic-ui-react'
+import { Container, Card, Divider, Rating, Responsive, Image } from 'semantic-ui-react'
 import Slider from 'react-slick'
 import Sound from 'react-sound'
 
@@ -30,7 +30,6 @@ class GameSummaryPage extends Component {
   render() {
     const {
       handleNextRound,
-      trans,
       score: {
         collections: {
           scores,
@@ -60,22 +59,21 @@ class GameSummaryPage extends Component {
         }}
       >
         <Card
-          image={score.image}
-          header={score.expression}
-          meta={trans('recognize:probability')}
           style={{
             backgroundColor: 'transparent',
             boxShadow: 'none',
           }}
-          description={(
+        >
+          <Image src={score.image} fluid />
+          <Card.Content style={{ position: 'absolute', bottom: 0, right: 0 }}>
             <Rating
               icon='star'
               size='massive'
               maxRating={5}
               rating={score.probability*5}
             />
-          )}
-        />
+          </Card.Content>
+        </Card>
       </div>
     ))
 

@@ -5,9 +5,9 @@ export const SCORES_GET_REQUEST = 'scores-get-request'
 export const SCORES_GET_SUCCESS = 'scores-get-success'
 export const SCORES_GET_FAILURE = 'scores-get-failure'
 
-export const SCORES_CLEAR_REQUEST = 'scores-get-request'
-export const SCORES_CLEAR_SUCCESS = 'scores-get-success'
-export const SCORES_CLEAR_FAILURE = 'scores-get-failure'
+export const SCORES_CLEAR_REQUEST = 'scores-clear-request'
+export const SCORES_CLEAR_SUCCESS = 'scores-clear-success'
+export const SCORES_CLEAR_FAILURE = 'scores-clear-failure'
 
 export const SCORE_ADD_REQUEST = 'score-add-request'
 export const SCORE_ADD_SUCCESS = 'score-add-success'

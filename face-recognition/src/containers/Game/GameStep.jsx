@@ -189,7 +189,7 @@ class GameStepContainer extends PureComponent {
 
   endStep() {
     const {
-      handleRecognition,
+      handleRecognitions,
       expression: {
         name: expression,
       },
@@ -201,19 +201,19 @@ class GameStepContainer extends PureComponent {
       return this.resetRecognition()
     }
 
-    _.forEach(this.winnersDescription, winnerDescription => {
+    handleRecognitions(_.map(this.winnersDescription, winnerDescription => {
       const { landmarks } = winnerDescription
       this.rightEyeCentroid = centroid(landmarks.getRightEye())
       this.leftEyeCentroid = centroid(landmarks.getLeftEye())
       this.faceAngle = Math.atan(slope(this.leftEyeCentroid, this.rightEyeCentroid))
       this.extractFaces(this.winnerImage)
 
-      handleRecognition(
+      return {
         expression,
-        this.canvasFace.current.toDataURL(),
-        winnerDescription.expressions[expression]
-      )
-    })
+        image: this.canvasFace.current.toDataURL(),
+        probability: winnerDescription.expressions[expression],
+      }
+    }))
   }
 
   landmarkWebCamPicture(picture) {
@@ -286,6 +286,7 @@ class GameStepContainer extends PureComponent {
               height: '100%',
               color: 'white',
               zIndex: 2000,
+              overflowY: 'hidden',
             }}
           >
             <ImageComponent

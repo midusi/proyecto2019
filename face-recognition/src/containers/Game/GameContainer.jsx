@@ -40,7 +40,7 @@ class GameContainer extends Component {
 
     this.handleNextStep = this.handleNextStep.bind(this)
     this.handleNextRound = this.handleNextRound.bind(this)
-    this.handleRecognition = this.handleRecognition.bind(this)
+    this.handleRecognitions = this.handleRecognitions.bind(this)
   }
 
   componentDidMount() {
@@ -80,6 +80,8 @@ class GameContainer extends Component {
       }
     } = this.props
 
+    onScoreFormClear()
+
     if (summary) {
       history.push('/game/summary')
       return
@@ -105,7 +107,7 @@ class GameContainer extends Component {
     })
   }
 
-  handleRecognition(expression, image, probability) {
+  handleRecognitions(recognitions) {
     const {
       actions: {
         onScoreFormFieldChange,
@@ -113,11 +115,15 @@ class GameContainer extends Component {
       }
     } = this.props
 
-    onScoreFormFieldChange('expression', expression)
-    onScoreFormFieldChange('probability', probability)
-    onScoreFormFieldChange('image', image)
+    console.log('AAAAAAAAAAAAAAAAAA', recognitions)
 
-    addScore()
+    _.forEach(recognitions, async ({expression, probability, image}) => {
+      onScoreFormFieldChange('expression', expression)
+      onScoreFormFieldChange('probability', probability)
+      onScoreFormFieldChange('image', image)
+
+      await addScore()
+    })
 
     this.handleNextStep()
   }
@@ -170,7 +176,7 @@ class GameContainer extends Component {
           trans={trans}
           handleNextStep={this.handleNextStep}
           handleNextRound={this.handleNextRound}
-          handleRecognition={this.handleRecognition}
+          handleRecognitions={this.handleRecognitions}
           initTimeout={(endStep) => {
             this.setState({ leftTime: STEP_TIME })
 
