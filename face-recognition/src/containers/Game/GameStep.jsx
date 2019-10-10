@@ -195,7 +195,7 @@ class GameStepContainer extends PureComponent {
       },
     } = this.props
 
-    this.setState({ started: false })
+    this.setState({ started: false, visible: false })
 
     if (_.isEmpty(this.winnersDescription)) {
       return this.resetRecognition()
@@ -298,7 +298,7 @@ class GameStepContainer extends PureComponent {
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                // opacity: 0.4,
+                opacity: 0.63,
               }}
             />
             <Header

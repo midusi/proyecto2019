@@ -3,7 +3,7 @@ import React, { Component, Fragment } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Modal, Image, Header, Select } from 'semantic-ui-react'
+import { Modal, Image, Select } from 'semantic-ui-react'
 import CountTo from 'react-count-to'
 import Sound from 'react-sound'
 
@@ -15,9 +15,10 @@ import {
   STEPS,
   REFRESH_TIME,
   STEP_TIME,
-  supportedExpressions as expressions,
+  supportedExpressions,
 } from 'src/config/recognition'
 
+import title from 'src-static/images/title.png'
 import settings from 'src-static/images/settings.png'
 import countdown from 'src-static/sound/countdown.mp3'
 import camera from 'src-static/sound/camera.mp3'
@@ -27,7 +28,7 @@ class GameContainer extends Component {
     super(props)
 
     this.state = {
-      expressions: _.sample(expressions, STEPS),
+      expressions: _.sample(supportedExpressions, STEPS),
       devices: [],
       active: 'step',
       leftTime: 0,
@@ -47,13 +48,11 @@ class GameContainer extends Component {
     const {
       actions: {
         onScoreFormClear,
-        clearScores,
         setDevice,
       }
     } = this.props
 
     onScoreFormClear()
-    clearScores()
     
     navigator.mediaDevices.enumerateDevices()
       .then(devices => this.setState(() => {
@@ -83,27 +82,34 @@ class GameContainer extends Component {
     onScoreFormClear()
 
     if (summary) {
-      history.push('/game/summary')
+      setTimeout(() => history.push('/game/summary'), 1000)
       return
     }
 
-    const [current, ...rest] = expressions
+    let current, nextExpressions
+    
+    if (_.isEmpty(expressions)) {
+      [current, ...nextExpressions] = _.sample(supportedExpressions, STEPS)
+    } else if (!next) {
+      const [r] = _.shuffle(_.sample(supportedExpressions, STEPS))
 
-    const [r] = _.shuffle(_.sample(expressions, STEPS))
+      nextExpressions = [...expressions, r]
+      current = expressions.shift()
+    } else {
+      [current, ...nextExpressions] = expressions
+    }
 
     this.setState({
       leftTime: 0,
       playCameraSound: false,
-      expressions: next ? rest : [...rest, r],
+      expressions: nextExpressions,
     })
 
     onScoreFormClear()
 
     history.replace('/game/step')
     setTimeout(() => {
-      next ?
-        history.push(`/game/step/${current.name}`) :
-        history.push(`/game/step/${[...rest, r][0].name}`)
+      history.push(`/game/step/${current.name}`)
     })
   }
 
@@ -114,8 +120,6 @@ class GameContainer extends Component {
         addScore,
       }
     } = this.props
-
-    console.log('AAAAAAAAAAAAAAAAAA', recognitions)
 
     _.forEach(recognitions, async ({expression, probability, image}) => {
       onScoreFormFieldChange('expression', expression)
@@ -129,7 +133,6 @@ class GameContainer extends Component {
   }
 
   handleNextRound() {
-    const { expressions } = this.state
     const {
       actions: {
         clearScores
@@ -137,15 +140,12 @@ class GameContainer extends Component {
     } = this.props
 
     this.setState({
-      expressions: _.isEmpty(expressions) ?
-        _.shuffle(_.sample(expressions, STEPS)) :
-        expressions,
       active: 'step',
       landmarkWebCamPicture: () => null,
     })
 
-    this.handleNextStep(true, false)
     clearScores()
+    this.handleNextStep(true, false)
   }
 
   render() {
@@ -244,20 +244,24 @@ class GameContainer extends Component {
             {!image && <Sound url={countdown} volume={50} playStatus={Sound.status.PLAYING} />}
           </Fragment>
         )}
-        {playCameraSound && <Sound url={camera} playStatus={Sound.status.PLAYING} />}
-        <Header
+        <Sound
+          url={camera}
+          playStatus={playCameraSound ? Sound.status.PLAYING : undefined}
+          onComplete={() => {
+            this.setState({ playCameraSound: false })
+          }}
+        />
+        <Image
           inverted
+          src={title}
           style={{
             position: 'absolute',
-            top: '25px',
+            top: '7%',
             left: '50%',
+            height: '20%',
             transform: 'translate(-50%, -50%)',
-            textTransform: 'uppercase',
-            fontSize: '5.3rem',
           }}
-        >
-          {trans('home:title')}
-        </Header>
+        />
         <Modal
           dimmer='blurring'
           trigger={(

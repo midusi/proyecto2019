@@ -37,6 +37,8 @@ class GameSummaryPage extends Component {
       },
     } = this.props
 
+    void handleNextRound
+
     const arrayedScores = Array.from(scores || [])
 
     const settings = {
@@ -55,7 +57,7 @@ class GameSummaryPage extends Component {
       <div
         key={`score-${i+1}`}
         style={{
-          padding: '0.5px'
+          padding: `${0.5 * i}px`,
         }}
       >
         <Card
@@ -79,7 +81,7 @@ class GameSummaryPage extends Component {
 
     return (
       <Fragment>
-        <Sound url={levelSuccess} playStatus={Sound.status.PLAYING} onFinishedPlaying={() => handleNextRound()} />
+        <Sound url={levelSuccess} playStatus={Sound.status.PLAYING} onFinishedPlaying={() => null} />
         <Container
           style={{
             paddingTop: '75px',
@@ -111,6 +113,8 @@ class GameSummaryPage extends Component {
               {...settings}
               slidesToShow={arrayedScores.length < 4 ? arrayedScores.length : 3}
               slidesToScroll={3}
+              adaptiveHeight
+              variableWidth
             >
               {scoresList}
             </Slider>
