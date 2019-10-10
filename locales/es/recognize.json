@@ -5,7 +5,13 @@
     "winner": "Ganador de la ronda",
     "probability": "Puntaje",
     "home": "Volver a empezar",
+    "expl": "{{expression}}",
     "options": {
         "next": "Siguiente"
+    },
+    "expression": {
+        "happy": "Feliz",
+        "angry": "Enojado",
+        "neutral": "Neutral"
     }
 }

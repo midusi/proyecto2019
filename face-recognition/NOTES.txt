@@ -1,0 +1,6 @@
+Agrandar tamaños de recuadros en caras
+
+Bajar texto descriptivo de la cara
+
+Esperar unamen de nombre de juego
+

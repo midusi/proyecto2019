@@ -49,6 +49,7 @@ export const clearScores = () => dispatch => {
   return backend.clearScores()
     .then(scores => {
       dispatch({ type: SCORES_CLEAR_SUCCESS, payload: scores })
+      dispatch(getScores())
     })
     .catch(err => {
       dispatch({ type: SCORES_CLEAR_FAILURE, payload: err })

@@ -18,7 +18,7 @@ const HomeContainer = props => {
     <div id='home-container'>
       <Sound url={yee} loop playStatus={Sound.status.PLAYING} />
       <div className='bg-image' style={{ backgroundImage: `url(${homeBackground})` }} />
-      <div textAlign='center' className='bg-text'>
+      <div className='bg-text'>
         <div className='cracked'>
           <span>{ trans('home:title') }</span>
           <span>{ trans('home:title') }</span>

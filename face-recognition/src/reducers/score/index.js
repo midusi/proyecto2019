@@ -112,13 +112,13 @@ const mutations = {
       }
     }
   },
-  [SCORES_CLEAR_SUCCESS](state, scores) {
+  [SCORES_CLEAR_SUCCESS](state) {
     return {
       ...state,
       collections: {
         ...state.collections,
         isFetching: false,
-        scores,
+        scores: null,
       }
     }
   },

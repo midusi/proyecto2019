@@ -1,22 +1,22 @@
-import React, { Component, Fragment } from 'react'
+import _ from 'underscore'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import * as faceapi from 'face-api.js'
-import { Image as ImageComponent } from 'semantic-ui-react'
+import { Image as ImageComponent, Transition, Header } from 'semantic-ui-react'
 
 import { withWindowDimensions } from 'src/helpers/window-size'
 import {
-  MODEL_URL,
   MIN_CONFIDENCE,
-  STEP_TIME,
   INPUT_SIZE,
   MIN_PROBABILITY,
   SCORE_WIDTH,
   SCORE_HEIGHT,
+  MIN_CONSISTENCY,
   supportedExpressions,
 } from 'src/config/recognition'
 
-import { winner } from 'src/helpers/face'
+import { winners } from 'src/helpers/face'
 import {
   centroid,
   slope,
@@ -24,22 +24,19 @@ import {
   generateBoxWithXCentroid
 } from 'src/helpers/math'
 
-class GameStepContainer extends Component {
-  static async loadModels() {
-    await faceapi.loadTinyFaceDetectorModel(MODEL_URL)
-    await faceapi.loadFaceExpressionModel(MODEL_URL)
-    await faceapi.loadFaceLandmarkModel(MODEL_URL)
-  }
-
+class GameStepContainer extends PureComponent {
   constructor(props) {
     super(props)
 
     this.state = {
-      faceExpresions: [],
+      visible: false,
+      started: false,
     }
 
     this.fullFaceDescriptions = null
-    this.winnerDescription = null
+    this.winnersDescription = null
+    this.framesTimeout = null
+    this.winnerImage = null
 
     this.canvasPicWebCam = React.createRef()
     this.canvasFace = React.createRef()
@@ -51,15 +48,13 @@ class GameStepContainer extends Component {
     this.drawBox = this.drawBox.bind(this)
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { setPictureHandler, setActive } = this.props
-
-    await GameStepContainer.loadModels()
 
     setActive('step')
     setPictureHandler(this.landmarkWebCamPicture)
 
-    setTimeout(() => this.endStep(), STEP_TIME * 1000)
+    this.setState({ visible: true, })
   }
 
   async getFullFaceDescription(canvas) {
@@ -68,29 +63,32 @@ class GameStepContainer extends Component {
       scoreThreshold: MIN_CONFIDENCE
     })
 
+    this.fullFaceDescriptions = await faceapi
+      .detectAllFaces(canvas, options)
+      .withFaceLandmarks()
+      .withFaceExpressions()
+  }
+
+  gameStarter(winners){
     const {
+      initTimeout,
       expression: {
         name: expression,
       }
     } = this.props
 
-    const winnerForExpression = winner(expression)
+    if( this.fullFaceDescriptions && winners[0].expressions[expression] > MIN_PROBABILITY){
+      if (this.framesTimeout == null){
+        this.framesTimeout = Date.now()
+      }
+    } else{
+      this.framesTimeout = null
+    }
 
-    this.fullFaceDescriptions = await faceapi
-      .detectAllFaces(canvas, options)
-      .withFaceLandmarks()
-      .withFaceExpressions()
-
-    if (this.fullFaceDescriptions && winnerForExpression(this.fullFaceDescriptions)) {
-      const { landmarks, expressions } = winnerForExpression(this.fullFaceDescriptions)
-
-      this.rightEyeCentroid = centroid(landmarks.getRightEye())
-      this.leftEyeCentroid = centroid(landmarks.getLeftEye())
-      this.faceAngle = Math.atan(slope(this.leftEyeCentroid, this.rightEyeCentroid))
-
-      this.setState(() => ({
-        faceExpresions: Object.entries(expressions)
-      }))
+    if (this.framesTimeout != null && this.framesTimeout != 0 && Date.now() - this.framesTimeout > MIN_CONSISTENCY) {
+      this.framesTimeout = null
+      this.setState({ started: true })
+      initTimeout(this.endStep)
     }
   }
 
@@ -148,7 +146,7 @@ class GameStepContainer extends Component {
     } = this.props
 
     const ctx = canvas.getContext('2d')
-    const lineWidth = 3
+    const lineWidth = 6
     const initialColor = 0x0040
     const finalColor = 0x00FF
 
@@ -162,7 +160,7 @@ class GameStepContainer extends Component {
 
     ctx.strokeStyle = color
     ctx.lineWidth = lineWidth
-    ctx.strokeRect(box.x, box.y, box.width, box.height)
+    ctx.strokeRect(box.x, box.y - 75, box.width, box.height + 75)
   }
 
   drawDescription(canvas, expression) {
@@ -186,29 +184,41 @@ class GameStepContainer extends Component {
       handleNextStep,
     } = this.props
 
-    handleNextStep(false)
+    handleNextStep(false, false)
   }
 
   endStep() {
     const {
-      handleRecognition,
+      handleRecognitions,
       expression: {
         name: expression,
       },
     } = this.props
 
-    if (!(this.winnerDescription && this.winnerDescription.expressions[expression] > MIN_PROBABILITY)) {
+    this.setState({ started: false, visible: false })
+
+    if (_.isEmpty(this.winnersDescription)) {
       return this.resetRecognition()
     }
 
-    handleRecognition(
-      expression,
-      this.canvasFace.current.toDataURL(),
-      this.winnerDescription.expressions[expression]
-    )
+    handleRecognitions(_.map(this.winnersDescription, winnerDescription => {
+      const { landmarks } = winnerDescription
+      this.rightEyeCentroid = centroid(landmarks.getRightEye())
+      this.leftEyeCentroid = centroid(landmarks.getLeftEye())
+      this.faceAngle = Math.atan(slope(this.leftEyeCentroid, this.rightEyeCentroid))
+      this.extractFaces(this.winnerImage)
+
+      return {
+        expression,
+        image: this.canvasFace.current.toDataURL(),
+        probability: winnerDescription.expressions[expression],
+      }
+    }))
   }
 
   landmarkWebCamPicture(picture) {
+    const { started } = this.state
+
     const {
       expression: {
         name: expression,
@@ -227,17 +237,17 @@ class GameStepContainer extends Component {
       await this.getFullFaceDescription(image)
       
       if (this.fullFaceDescriptions && this.fullFaceDescriptions.length) {
-        let frameWinnerDescription = winner(expression)(this.fullFaceDescriptions)
-        
-        if (!this.winnerDescription || (frameWinnerDescription && frameWinnerDescription.expressions[expression] > this.winnerDescription.expressions[expression])) {
-          this.winnerDescription = frameWinnerDescription
+        this.winnersDescription = winners(expression)(this.fullFaceDescriptions)
+        this.winnerImage = image
+
+        if (!started){
+          this.gameStarter(this.winnersDescription)
         }
         
         if (!this.canvasPicWebCam.current || !this.canvasFace.current) {
           return
         }
         
-        this.extractFaces(image)
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         this.drawDescription(this.canvasPicWebCam.current, expression)
       }
@@ -248,16 +258,17 @@ class GameStepContainer extends Component {
   }
 
   render() {
-    const { faceExpresions } = this.state
+    const { visible, started } = this.state
+
     const {
       windowHeight,
       windowWidth,
+      trans,
       expression: {
         image,
+        name,
       },
     } = this.props
-    
-    void faceExpresions
 
     return (
       <Fragment>
@@ -265,19 +276,59 @@ class GameStepContainer extends Component {
           ref={this.canvasPicWebCam}
           width={windowWidth}
           height={windowHeight}
-          style={{ position: 'absolute' }}
+          style={{ position: 'absolute', transform: 'scaleX(-1)' }}
         />
-        <ImageComponent
-          size='small'
-          src={image}
-          avatar
-          style={{
-            position: 'absolute',
-            left: '5px',
-            top: '5px',
-            zIndex: 2000,
-          }}
-        />
+        <Transition animation='zoom' visible={visible && !started} duration={500}>
+          <center
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              color: 'white',
+              zIndex: 2000,
+              overflowY: 'hidden',
+            }}
+          >
+            <ImageComponent
+              size='large'
+              src={image}
+              avatar
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                opacity: 0.63,
+              }}
+            />
+            <Header
+              inverted
+              style={{
+                position: 'absolute',
+                bottom: '25px',
+                left: '50%',
+                transform: 'translate(-50%, 20%)',
+                textTransform: 'uppercase',
+                fontSize: '12.53rem',
+              }}
+            >
+              {trans('recognize:expl', { expression: trans(`recognize:expression.${name}`) })}
+            </Header>
+          </center>
+        </Transition>
+        <Transition animation='zoom' visible={visible && started} duration={500}>
+          <ImageComponent
+            size='tiny'
+            src={image}
+            avatar
+            style={{
+              position: 'absolute',
+              left: '5px',
+              top: '5px',
+              zIndex: 2000,
+            }}
+          />
+        </Transition>
         <canvas
           style={{ visibility: 'hidden' }}
           ref={this.canvasFace}
