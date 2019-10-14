@@ -141,12 +141,13 @@ class GameStepContainer extends PureComponent {
     const {
       expression: {
         minHigh: minHigh,
-        maxHigh: maxHigh
+        // maxHigh: maxHigh
       },
     } = this.props
 
     const ctx = canvas.getContext('2d')
     const lineWidth = 6
+    /*
     const initialColor = 0x0040
     const finalColor = 0x00FF
 
@@ -157,7 +158,8 @@ class GameStepContainer extends PureComponent {
       let intensity = Math.floor(initialColor + (finalColor - initialColor)*ratio)
       color = '#00' + intensity.toString(16) + initialColor.toString(16)
     }
-
+    */
+    let color = (confidence > minHigh)? '#D2222D' : '#238823'
     ctx.strokeStyle = color
     ctx.lineWidth = lineWidth
     ctx.strokeRect(box.x, box.y - 75, box.width, box.height + 75)
