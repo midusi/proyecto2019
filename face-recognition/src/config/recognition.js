@@ -4,7 +4,7 @@ import happy from 'src-static/images/expressions/happy.png'
 import neutral from 'src-static/images/expressions/neutral.png'
 import sad from 'src-static/images/expressions/sad.png'
 
-export const MODEL_URL = process.env.NODE_ENV === 'development' ? '/models' : /* '/proyecto2019/models' */ '/models'
+export const MODEL_URL = process.env.NODE_ENV === 'development' ? '/models' : '/proyecto2019/models'
 export const MIN_CONFIDENCE = 0.6
 export const REFRESH_TIME = 10
 export const STEP_TIME = 3
