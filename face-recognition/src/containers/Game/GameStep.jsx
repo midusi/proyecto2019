@@ -264,9 +264,6 @@ class GameStepContainer extends PureComponent {
       },
     } = this.props
 
-    console.log(windowHeight)
-    console.log(windowWidth)
-
     return (
       <Fragment>
         <canvas
