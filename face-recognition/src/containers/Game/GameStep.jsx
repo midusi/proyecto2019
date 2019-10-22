@@ -279,8 +279,8 @@ class GameStepContainer extends PureComponent {
       <Fragment>
         <canvas
           ref={this.canvasPicWebCam}
-          width={windowWidth}
-          height={windowHeight}
+          width={windowWidth == 0? '1920' : windowWidth}
+          height={windowHeight == 0? '1080' : windowWidth}
           style={{ position: 'absolute', transform: 'scaleX(-1)' }}
         />
         <Transition animation='zoom' visible={visible && !started} duration={500}>
