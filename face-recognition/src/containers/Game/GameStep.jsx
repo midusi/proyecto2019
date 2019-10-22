@@ -159,7 +159,7 @@ class GameStepContainer extends PureComponent {
       color = '#00' + intensity.toString(16) + initialColor.toString(16)
     }
     */
-    let color = (confidence > minHigh)? '#D2222D' : '#238823'
+    let color = (confidence > MIN_PROBABILITY)? '#238823' : '#D2222D'
     ctx.strokeStyle = color
     ctx.lineWidth = lineWidth
     ctx.strokeRect(box.x, box.y - 75, box.width, box.height + 75)
