@@ -25,6 +25,27 @@ import {
 } from 'src/helpers/math'
 
 class GameStepContainer extends PureComponent {
+  static drawBox(canvas, box, confidence) {
+    const ctx = canvas.getContext('2d')
+    const lineWidth = 6
+    /*
+    const initialColor = 0x0040
+    const finalColor = 0x00FF
+
+    let color = '#00' + initialColor.toString(16) + initialColor.toString(16)
+    if (confidence > minHigh) {
+      let ratio = (confidence - minHigh)/(maxHigh - minHigh)
+      if (ratio > 1) ratio = 1
+      let intensity = Math.floor(initialColor + (finalColor - initialColor)*ratio)
+      color = '#00' + intensity.toString(16) + initialColor.toString(16)
+    }
+    */
+    let color = (confidence > MIN_PROBABILITY)? '#238823' : '#D2222D'
+    ctx.strokeStyle = color
+    ctx.lineWidth = lineWidth
+    ctx.strokeRect(box.x, box.y - 75, box.width, box.height + 75)
+  }
+
   constructor(props) {
     super(props)
 
@@ -45,7 +66,6 @@ class GameStepContainer extends PureComponent {
     this.runRecognition = this.runRecognition.bind(this)
     this.resetRecognition = this.resetRecognition.bind(this)
     this.endStep = this.endStep.bind(this)
-    this.drawBox = this.drawBox.bind(this)
   }
 
   componentDidMount() {
@@ -67,6 +87,14 @@ class GameStepContainer extends PureComponent {
       .detectAllFaces(canvas, options)
       .withFaceLandmarks()
       .withFaceExpressions()
+  }
+
+  drawDescription(canvas, expression) {
+    this.fullFaceDescriptions.forEach(
+      ({ detection, expressions }) => {
+        GameStepContainer.drawBox(canvas, detection.box, expressions[expression])
+      }
+    )
   }
 
   gameStarter(winners){
@@ -137,6 +165,7 @@ class GameStepContainer extends PureComponent {
     )
   }
 
+<<<<<<< HEAD
   drawBox(canvas, box, confidence) {
     const {
       expression: {
@@ -173,6 +202,8 @@ class GameStepContainer extends PureComponent {
     )
   }
 
+=======
+>>>>>>> master
   runRecognition() {
     if (!this.webCamPicture.current)
       return
