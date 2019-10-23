@@ -84,7 +84,7 @@ class GameSummaryPage extends Component {
             floated='right'
             style={{
               position: 'absolute',
-              top: '-5px',
+              top: '0px',
               right: '-13.5%',
               zIndex: 2001,
               backgroundColor: 'transparent',
