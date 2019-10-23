@@ -165,45 +165,6 @@ class GameStepContainer extends PureComponent {
     )
   }
 
-<<<<<<< HEAD
-  drawBox(canvas, box, confidence) {
-    const {
-      expression: {
-        minHigh: minHigh,
-        // maxHigh: maxHigh
-      },
-    } = this.props
-
-    const ctx = canvas.getContext('2d')
-    const lineWidth = 6
-    /*
-    const initialColor = 0x0040
-    const finalColor = 0x00FF
-
-    let color = `#${0x0090.toString(16)}0000`
-    if (confidence > minHigh) {
-      let ratio = (confidence - minHigh)/(maxHigh - minHigh)
-      if (ratio > 1) ratio = 1
-      let intensity = Math.floor(initialColor + (finalColor - initialColor)*ratio)
-      color = `#00${intensity.toString(16)}${initialColor.toString(16)}`
-    }
-    */
-    let color = (confidence > minHigh)? '#D2222D' : '#238823'
-    ctx.strokeStyle = color
-    ctx.lineWidth = lineWidth
-    ctx.strokeRect(box.x, box.y - 75, box.width, box.height + 75)
-  }
-
-  drawDescription(canvas, expression) {
-    this.fullFaceDescriptions.forEach(
-      ({ detection, expressions }) => {
-        this.drawBox(canvas, detection.box, expressions[expression])
-      }
-    )
-  }
-
-=======
->>>>>>> master
   runRecognition() {
     if (!this.webCamPicture.current)
       return
