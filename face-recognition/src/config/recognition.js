@@ -1,5 +1,3 @@
-import _ from 'underscore'
-
 import angry from 'src-static/images/expressions/angry.png'
 import fearfull from 'src-static/images/expressions/fearfull.png'
 import happy from 'src-static/images/expressions/happy.png'
@@ -60,4 +58,4 @@ export const expressions = [{
   disabled: true,
 }]
 
-export const supportedExpressions = _.shuffle(expressions.filter(e => !e.disabled))
+export const supportedExpressions = expressions.filter(e => !e.disabled)
