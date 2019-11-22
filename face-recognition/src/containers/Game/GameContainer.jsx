@@ -89,9 +89,9 @@ class GameContainer extends Component {
     let current, nextExpressions
     
     if (_.isEmpty(expressions)) {
-      [current, ...nextExpressions] = _.sample(supportedExpressions, STEPS)
+      [current, ...nextExpressions] = _.sample(_.shuffle(supportedExpressions), STEPS)
     } else if (!next) {
-      const [r] = _.shuffle(_.sample(supportedExpressions, STEPS))
+      const [r] = _.sample(_.shuffle(supportedExpressions), STEPS)
 
       nextExpressions = [...expressions, r]
       current = expressions.shift()
