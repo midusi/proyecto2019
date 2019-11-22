@@ -39,6 +39,7 @@ export const expressions = [{
   maxHigh: 1,
 }, {
   name: 'angry',
+  disabled: true,
   image: angry,
   minHigh: 0.55,
   maxHigh: 1,
