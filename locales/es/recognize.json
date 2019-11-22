@@ -12,6 +12,7 @@
     "expression": {
         "happy": "Feliz",
         "angry": "Enojado",
-        "neutral": "Neutral"
+        "neutral": "Neutral",
+        "sad": "Triste"
     }
 }
