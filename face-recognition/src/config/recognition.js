@@ -15,7 +15,7 @@ export const STEP_TIME = 3
 // for face tracking via webcam I would recommend using smaller sizes,
 // e.g. 128, 160, for detecting smaller faces use larger sizes, e.g. 512, 608
 // default: 416
-export const INPUT_SIZE = 416
+export const INPUT_SIZE = 320
 export const MIN_PROBABILITY = 0.1
 export const SCORE_WIDTH = 350
 export const SCORE_HEIGHT = 350
@@ -35,12 +35,12 @@ export const expressions = [{
 }, {
   name: 'sad',
   image: sad,
-  minHigh: 0.7,
+  minHigh: 0.65,
   maxHigh: 1,
 }, {
   name: 'angry',
   image: angry,
-  minHigh: 0.6,
+  minHigh: 0.55,
   maxHigh: 1,
 }, {
   name: 'fearfull',
