@@ -33,7 +33,7 @@
     "docker:start:prod": "docker run --rm -it --network host -v $PWD:/usr/src/app midusi_proyecto_2019:production"
   },
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "babel-loader": "^8.0.6",
     "babel-plugin-module-resolver": "^3.2.0",
     "bundle-buddy-webpack-plugin": "^0.3.0",
